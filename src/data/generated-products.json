@@ -1,0 +1,816 @@
+[
+  {
+    "id": "ARG-1000",
+    "slug": "aceite-de-argan-1000g",
+    "nombre": "Aceite de argán",
+    "categoria": "Materias primas",
+    "precio": 200000,
+    "presentacion": "1 kg",
+    "descripcion": "Aceite vegetal rico en ácidos grasos esenciales y vitamina E, utilizado como emoliente y acondicionador en formulaciones cosméticas y capilares.",
+    "usos": [
+      "Cremas y lociones",
+      "Sérums faciales",
+      "Mascarillas",
+      "Productos capilares"
+    ],
+    "caracteristicas": [
+      "Hidratante y nutritivo",
+      "Acción antioxidante",
+      "Mejora la elasticidad",
+      "Aporta brillo y suavidad"
+    ],
+    "especificaciones": {
+      "Origen": "Vegetal",
+      "Grado": "Cosmético",
+      "Apariencia": "Líquido oleoso",
+      "Almacenamiento": "Lugar fresco y seco"
+    },
+    "imagen": "/productos/aceite-de-argan-1000g.png",
+    "destacado": true,
+    "sourceFile": "catalogo/aceiteargan.png",
+    "sourceHash": "293eb0825727faf714b3eb84110ecec783c71df315a5f9be816251abfde9d001"
+  },
+  {
+    "id": "AES-125",
+    "slug": "acido-estearico-125g",
+    "nombre": "Ácido esteárico",
+    "categoria": "Materias primas",
+    "precio": 5000,
+    "presentacion": "125 g",
+    "descripcion": "Ácido graso de origen vegetal utilizado como agente de consistencia, coemulsionante y estabilizante en cremas, lociones, jabones y otras formulaciones.",
+    "usos": [
+      "Cremas cosméticas",
+      "Jabones",
+      "Velas",
+      "Emulsiones"
+    ],
+    "caracteristicas": [
+      "Aporta cuerpo y consistencia",
+      "Mejora la estabilidad",
+      "Fácil incorporación",
+      "Uso versátil"
+    ],
+    "especificaciones": {
+      "Familia": "Ácido graso",
+      "Grado": "Técnico/cosmético",
+      "Apariencia": "Sólido blanco",
+      "Presentación": "Bolsa resellable"
+    },
+    "imagen": "/productos/acido-estearico-125g.png",
+    "sourceFile": "catalogo/acido esteriatico 125.png",
+    "sourceHash": "8926440d08f6c3666b3d29a108e925177e9bd7d3809fb3da755adcf5a9538e84"
+  },
+  {
+    "id": "AES-250",
+    "slug": "acido-estearico-250g",
+    "nombre": "Ácido esteárico",
+    "categoria": "Materias primas",
+    "precio": 8500,
+    "presentacion": "250 g",
+    "descripcion": "Ácido graso de origen vegetal utilizado como agente de consistencia, coemulsionante y estabilizante en cremas, lociones, jabones y otras formulaciones.",
+    "usos": [
+      "Cremas cosméticas",
+      "Jabones",
+      "Velas",
+      "Emulsiones"
+    ],
+    "caracteristicas": [
+      "Aporta cuerpo y consistencia",
+      "Mejora la estabilidad",
+      "Fácil incorporación",
+      "Uso versátil"
+    ],
+    "especificaciones": {
+      "Familia": "Ácido graso",
+      "Grado": "Técnico/cosmético",
+      "Apariencia": "Sólido blanco",
+      "Presentación": "Bolsa resellable"
+    },
+    "imagen": "/productos/acido-estearico-250g.png",
+    "sourceFile": "catalogo/acido esteriatico 250.png",
+    "sourceHash": "3128b8a4719530fb996f5884a880311ef3bd9e15cc8d66dfa746d957ad635730"
+  },
+  {
+    "id": "AES-500",
+    "slug": "acido-estearico-500g",
+    "nombre": "Ácido esteárico",
+    "categoria": "Materias primas",
+    "precio": 15000,
+    "presentacion": "500 g",
+    "descripcion": "Ácido graso de origen vegetal utilizado como agente de consistencia, coemulsionante y estabilizante en cremas, lociones, jabones y otras formulaciones.",
+    "usos": [
+      "Cremas cosméticas",
+      "Jabones",
+      "Velas",
+      "Emulsiones"
+    ],
+    "caracteristicas": [
+      "Aporta cuerpo y consistencia",
+      "Mejora la estabilidad",
+      "Fácil incorporación",
+      "Uso versátil"
+    ],
+    "especificaciones": {
+      "Familia": "Ácido graso",
+      "Grado": "Técnico/cosmético",
+      "Apariencia": "Sólido blanco",
+      "Presentación": "Bolsa resellable"
+    },
+    "imagen": "/productos/acido-estearico-500g.png",
+    "sourceFile": "catalogo/acido esteriatico 500.png",
+    "sourceHash": "da9d25309f76e8d5bb2c6321592f9d6c321c82d39c8f212a60599518d57f20f4"
+  },
+  {
+    "id": "AUTO-6834F538",
+    "slug": "acido-fosforico-85-500-g",
+    "nombre": "Ácido fosfórico 85%",
+    "categoria": "Información pendiente",
+    "precio": 10000,
+    "presentacion": "500 g",
+    "descripcion": "Ácido inorgánico concentrado empleado en limpieza, desoxidación, ajuste de pH y diversos procesos industriales o de formulación química.",
+    "usos": [],
+    "caracteristicas": [
+      "Alta pureza y concentración.",
+      "Soluble en agua.",
+      "Estable y de alta reactividad controlada.",
+      "Ideal para aplicaciones cosméticas y de cuidado personal."
+    ],
+    "especificaciones": {},
+    "imagen": "/productos/acido-fosforico-85-500-g.png",
+    "informacionPendiente": true,
+    "extraccionIncompleta": false,
+    "extractionVersion": 2,
+    "textoVisual": "— | a\nH¿PO,\nÁcido fosfórico al 85% de\nalta pureza. Incoloro,\ninodoro, soluble en agua\nSUPRAQUIM Él y de alta estabilidad.\nACIDO FOSFORICO/85%\n$10.000\nANTINDNNINTO\n[+] Alta pureza y concentración.\nSoluble en agua.\n€ Estable y de alta reactividad\ncontrolada.\n< < o Ideal para aplicaciones cosméticas\n“ y de cuidado personal.\n7 Z o\nACIDO FOSFORICO 85% PRESENTACIÓN: PRECIO:\nIngrediente cosmético\nde alta pureza 500 g $1 0.000\n5009",
+    "sourceFile": "catalogo/acido fosforico 500.png",
+    "sourceHash": "6834f53865c3f5a1e950d731c4b8e0088a76141364e700512cc988cc0dc06f3e"
+  },
+  {
+    "id": "ASO-250",
+    "slug": "acido-sorbico-250g",
+    "nombre": "Ácido sórbico",
+    "categoria": "Químicos especializados",
+    "precio": 14000,
+    "presentacion": "250 g",
+    "descripcion": "Conservante utilizado para ayudar a proteger formulaciones frente al crecimiento de hongos, levaduras y otros microorganismos.",
+    "usos": [
+      "Cosmética",
+      "Cuidado personal",
+      "Formulaciones acuosas",
+      "Procesos industriales"
+    ],
+    "caracteristicas": [
+      "Acción conservante",
+      "Alta pureza",
+      "Fácil dosificación",
+      "Amplio campo de aplicación"
+    ],
+    "especificaciones": {
+      "Función": "Conservante",
+      "Apariencia": "Polvo blanco",
+      "Presentación": "Bolsa resellable",
+      "Almacenamiento": "Protegido de humedad"
+    },
+    "imagen": "/productos/acido-sorbico-250g.png",
+    "sourceFile": "catalogo/acido sorbico 250.png",
+    "sourceHash": "2ff0648508d095838abd4799b9edd0e670116088a57ecf4242892f1ee532a448"
+  },
+  {
+    "id": "BCR-500",
+    "slug": "base-para-crema-500g",
+    "nombre": "Base para crema",
+    "categoria": "Materias primas",
+    "precio": 12000,
+    "presentacion": "500 g",
+    "descripcion": "Base cosmética lista para personalizar con activos, extractos, fragancias y otros aditivos compatibles en formulaciones de cuidado personal.",
+    "usos": [
+      "Cremas corporales",
+      "Cremas faciales",
+      "Productos hidratantes",
+      "Preparaciones cosméticas"
+    ],
+    "caracteristicas": [
+      "Lista para formular",
+      "Textura uniforme",
+      "Fácil personalización",
+      "Buena extensibilidad"
+    ],
+    "especificaciones": {
+      "Tipo": "Base emulsionada",
+      "Grado": "Cosmético",
+      "Apariencia": "Crema blanca",
+      "Presentación": "Recipiente plástico"
+    },
+    "imagen": "/productos/base-para-crema-500g.png",
+    "destacado": true,
+    "sourceFile": "catalogo/base crema.png",
+    "sourceHash": "eb42a0aa1e77d89560a4bca4ec90afb23750cc9f1538e4f22243ad80be4578ac"
+  },
+  {
+    "id": "BIS-500",
+    "slug": "bisulfito-de-sodio-500g",
+    "nombre": "Bisulfito de sodio",
+    "categoria": "Insumos industriales",
+    "precio": 5000,
+    "presentacion": "500 g",
+    "descripcion": "Agente reductor y antioxidante utilizado en tratamiento de aguas, limpieza técnica y distintos procesos industriales.",
+    "usos": [
+      "Tratamiento de aguas",
+      "Procesos industriales",
+      "Agente reductor",
+      "Control de oxidación"
+    ],
+    "caracteristicas": [
+      "Alta solubilidad",
+      "Acción reductora",
+      "Dosificación práctica",
+      "Uso industrial"
+    ],
+    "especificaciones": {
+      "Familia": "Sal inorgánica",
+      "Grado": "Técnico",
+      "Apariencia": "Sólido blanco",
+      "Almacenamiento": "Lugar seco y ventilado"
+    },
+    "imagen": "/productos/bisulfito-de-sodio-500g.png",
+    "sourceFile": "catalogo/bisulfito sodio.png",
+    "sourceHash": "53b035b298f895ed6e84c3916fee10d766990345e12e61eaf62338d6449ad3b2"
+  },
+  {
+    "id": "AUTO-B010CE2A",
+    "slug": "butyl-cellosolve-500-g",
+    "nombre": "Butyl Cellosolve",
+    "categoria": "Información pendiente",
+    "precio": 10000,
+    "presentacion": "500 g",
+    "descripcion": "Solvente de alta eficacia empleado en formulaciones de limpieza, desengrasantes, recubrimientos y otros procesos industriales.",
+    "usos": [],
+    "caracteristicas": [
+      "Excelente solvente.",
+      "Mejora la formulación de productos cosméticos.",
+      "Humectante y emoliente.",
+      "Compatible con una amplia variedad de ingredientes."
+    ],
+    "especificaciones": {},
+    "imagen": "/productos/butyl-cellosolve-500-g.png",
+    "informacionPendiente": true,
+    "extraccionIncompleta": false,
+    "extractionVersion": 2,
+    "textoVisual": "|. A FÓRMULA:\nCgH140>\nÉter de glycol de butilo\nde alta pureza. Incoloro,\nde olor característico,\nmiscible en agua y de\nalta estabilidad.\nSUPRAQUIM é\nBUTYL CELLOSOLVE/5009\n$10.000 a\nINTIMO AP AE\n500183\nExcelente solvente.\n€ Mejora la formulación\nde productos cosméticos.\n€ Humectante y emoliente.\n. a € Compatible con una amplia\nvariedad de ingredientes.\nU Cc Oso PRESENTACIÓN: PRECIO:\nSolvente y humectante\npara uso cosmético 500 g $1 0.000\n500 g",
+    "sourceFile": "catalogo/butylcello.png",
+    "sourceHash": "b010ce2a66e2c93013f9e65eac8b71fa3f5c3ed4ce798fea3a0e596a0256feb8"
+  },
+  {
+    "id": "CAR-125",
+    "slug": "carbopol-125g",
+    "nombre": "Carbopol",
+    "categoria": "Químicos especializados",
+    "precio": 20000,
+    "presentacion": "125 g",
+    "descripcion": "Polímero espesante de alto rendimiento utilizado para formar geles, estabilizar emulsiones y mejorar la viscosidad de formulaciones cosméticas o de limpieza.",
+    "usos": [
+      "Geles hidroalcohólicos",
+      "Geles cosméticos",
+      "Productos de limpieza",
+      "Suspensiones"
+    ],
+    "caracteristicas": [
+      "Alta capacidad espesante",
+      "Forma geles transparentes",
+      "Eficiente a baja dosis",
+      "Buena estabilidad"
+    ],
+    "especificaciones": {
+      "Función": "Modificador reológico",
+      "Apariencia": "Polvo blanco",
+      "Dispersión": "En fase acuosa",
+      "Presentación": "Bolsa resellable"
+    },
+    "imagen": "/productos/carbopol-125g.png",
+    "sourceFile": "catalogo/carbopol 125.png",
+    "sourceHash": "b7588c053e59893de9529eb0519e726b3f550ca5ced63de76ff3be91edc961a4"
+  },
+  {
+    "id": "CAR-250",
+    "slug": "carbopol-250g",
+    "nombre": "Carbopol",
+    "categoria": "Químicos especializados",
+    "precio": 36000,
+    "presentacion": "250 g",
+    "descripcion": "Polímero espesante de alto rendimiento utilizado para formar geles, estabilizar emulsiones y mejorar la viscosidad de formulaciones cosméticas o de limpieza.",
+    "usos": [
+      "Geles hidroalcohólicos",
+      "Geles cosméticos",
+      "Productos de limpieza",
+      "Suspensiones"
+    ],
+    "caracteristicas": [
+      "Alta capacidad espesante",
+      "Forma geles transparentes",
+      "Eficiente a baja dosis",
+      "Buena estabilidad"
+    ],
+    "especificaciones": {
+      "Función": "Modificador reológico",
+      "Apariencia": "Polvo blanco",
+      "Dispersión": "En fase acuosa",
+      "Presentación": "Bolsa resellable"
+    },
+    "imagen": "/productos/carbopol-250g.png",
+    "sourceFile": "catalogo/carbopol 250.png",
+    "sourceHash": "cfc21c6ba4156c077c86618694fab94c068b6c5e027f7ea9b511d3bbba0e3043"
+  },
+  {
+    "id": "CMC-125",
+    "slug": "cmc-alta-125g",
+    "nombre": "CMC de alta viscosidad",
+    "categoria": "Químicos especializados",
+    "precio": 7200,
+    "presentacion": "125 g",
+    "descripcion": "Carboximetilcelulosa de alta viscosidad utilizada como espesante, estabilizante y modificador reológico en formulaciones cosméticas, de limpieza e industriales.",
+    "usos": [
+      "Detergentes",
+      "Adhesivos",
+      "Cosméticos",
+      "Suspensiones"
+    ],
+    "caracteristicas": [
+      "Alta viscosidad",
+      "Buena retención de agua",
+      "Estabiliza formulaciones",
+      "Fácil dispersión"
+    ],
+    "especificaciones": {
+      "Función": "Espesante",
+      "Apariencia": "Polvo blanco",
+      "Solubilidad": "Dispersable en agua",
+      "Presentación": "Bolsa resellable"
+    },
+    "imagen": "/productos/cmc-alta-125g.png",
+    "sourceFile": "catalogo/cmc alta.png",
+    "sourceHash": "70ff21b719a438c54b8b160d3cc967b0fa55e6d5e2987a732767701a25674acc"
+  },
+  {
+    "id": "DIO-125",
+    "slug": "dioxido-de-titanio-125g",
+    "nombre": "Dióxido de titanio",
+    "categoria": "Insumos industriales",
+    "precio": 6000,
+    "presentacion": "125 g",
+    "descripcion": "Pigmento mineral blanco de alto poder cubriente, utilizado para aportar opacidad, color y cobertura en formulaciones cosméticas e industriales.",
+    "usos": [
+      "Pinturas y recubrimientos",
+      "Jabones",
+      "Cosméticos",
+      "Plásticos"
+    ],
+    "caracteristicas": [
+      "Alto poder cubriente",
+      "Blancura uniforme",
+      "Buena estabilidad",
+      "Versátil en formulación"
+    ],
+    "especificaciones": {
+      "Función": "Pigmento",
+      "Color": "Blanco",
+      "Apariencia": "Polvo fino",
+      "Presentación": "Bolsa resellable"
+    },
+    "imagen": "/productos/dioxido-de-titanio-125g.png",
+    "sourceFile": "catalogo/dioxido titanio 125.png",
+    "sourceHash": "6b9c0ade1eb562406c30a1a3fc64045002f4b568a7b27c94f26dd4036649806f"
+  },
+  {
+    "id": "DIO-250",
+    "slug": "dioxido-de-titanio-250g",
+    "nombre": "Dióxido de titanio",
+    "categoria": "Insumos industriales",
+    "precio": 10000,
+    "presentacion": "250 g",
+    "descripcion": "Pigmento mineral blanco de alto poder cubriente, utilizado para aportar opacidad, color y cobertura en formulaciones cosméticas e industriales.",
+    "usos": [
+      "Pinturas y recubrimientos",
+      "Jabones",
+      "Cosméticos",
+      "Plásticos"
+    ],
+    "caracteristicas": [
+      "Alto poder cubriente",
+      "Blancura uniforme",
+      "Buena estabilidad",
+      "Versátil en formulación"
+    ],
+    "especificaciones": {
+      "Función": "Pigmento",
+      "Color": "Blanco",
+      "Apariencia": "Polvo fino",
+      "Presentación": "Bolsa resellable"
+    },
+    "imagen": "/productos/dioxido-de-titanio-250g.png",
+    "sourceFile": "catalogo/dioxido de titanio 250.png",
+    "sourceHash": "8f5d60f4483125e546f6e15e2fd9a225168c847a375bb050f3019102240c68cf"
+  },
+  {
+    "id": "DIO-500",
+    "slug": "dioxido-de-titanio-500g",
+    "nombre": "Dióxido de titanio",
+    "categoria": "Insumos industriales",
+    "precio": 18000,
+    "presentacion": "500 g",
+    "descripcion": "Pigmento mineral blanco de alto poder cubriente, utilizado para aportar opacidad, color y cobertura en formulaciones cosméticas e industriales.",
+    "usos": [
+      "Pinturas y recubrimientos",
+      "Jabones",
+      "Cosméticos",
+      "Plásticos"
+    ],
+    "caracteristicas": [
+      "Alto poder cubriente",
+      "Blancura uniforme",
+      "Buena estabilidad",
+      "Versátil en formulación"
+    ],
+    "especificaciones": {
+      "Función": "Pigmento",
+      "Color": "Blanco",
+      "Apariencia": "Polvo fino",
+      "Presentación": "Bolsa resellable"
+    },
+    "imagen": "/productos/dioxido-de-titanio-500g.png",
+    "sourceFile": "catalogo/dioxido titanio.png",
+    "sourceHash": "d199469ff2b8a49dac1ad54dafdc8fc82061a85c18d522cc2f12bb2544cd5af5"
+  },
+  {
+    "id": "AUTO-5A7C32B8",
+    "slug": "dipropilenglicol-500-g",
+    "nombre": "Dipropilenglicol",
+    "categoria": "Información pendiente",
+    "precio": 14000,
+    "presentacion": "500 g",
+    "descripcion": "Solvente y vehículo de baja volatilidad utilizado en perfumería, cosmética y formulaciones aromáticas para mejorar la disolución y estabilidad de ciertos ingredientes.",
+    "usos": [],
+    "caracteristicas": [
+      "Excelente humectante.",
+      "Mejora la textura y estabilidad de las formulaciones.",
+      "Solvente cosmético seguro y versátil.",
+      "Compatible con una amplia variedad de ingredientes."
+    ],
+    "especificaciones": {},
+    "imagen": "/productos/dipropilenglicol-500-g.png",
+    "informacionPendiente": true,
+    "extraccionIncompleta": false,
+    "extractionVersion": 2,
+    "textoVisual": "é FÓRMULA:\nE C m2\nCe H 140;\n= Compuesto orgánico diol\nde alta pureza. Incoloro,\ninodoro, soluble en agua\ny de alta estabilidad.\nSUPRAQUIM é\nDIPROPILENGLICOL/5009\n$14.000\nnO UN\n500295\n€) Excelente humectante.\nMejora la textura y estabilidad\nde las formulaciones.\nE Solvente cosmético seguro\ny versátil.\n<> Compatible con una amplia\nvariedad de ingredientes.\nDIPROPILENGLICOL PRESENTACIÓN: PRECIO:\nHumectante y solvente\npara uso cosmético 500 g S 14.000\n500 9",
+    "sourceFile": "catalogo/dipropilenglicol.png",
+    "sourceHash": "5a7c32b87f89117e670f3548dd9571856828f45133ef4f3cba4752cdb361f20d"
+  },
+  {
+    "id": "AUTO-417AB736",
+    "slug": "gentamina-q60-500-g",
+    "nombre": "Gentamina Q60",
+    "categoria": "Información pendiente",
+    "precio": 12000,
+    "presentacion": "500 g",
+    "descripcion": "Materia prima de uso técnico empleada como auxiliar de formulación en productos de limpieza o cuidado personal, según su ficha técnica y compatibilidad con la fórmula.",
+    "usos": [],
+    "caracteristicas": [
+      "Antibacteriano de amplio espectro.",
+      "Alta pureza y efectividad.",
+      "Soluble en agua.",
+      "Estable y seguro para formulaciones."
+    ],
+    "especificaciones": {},
+    "imagen": "/productos/gentamina-q60-500-g.png",
+    "informacionPendiente": true,
+    "extraccionIncompleta": false,
+    "extractionVersion": 2,
+    "textoVisual": "é FÓRMULA:\nLd£Ee- -—— ---  ——\n| — |\nÁ N\n— ? Ci9H37 NO,\nCompuesto orgánico de\n5 7 alta pureza. Incoloro,\n¿ inodoro, soluble en agua\n<a y de alta estabilidad.\n$12.000\nLT\n50030\nCARACTERÍSTICAS:\nO Antibacteriano de amplio\nS Z espectro.\nN Y O Alta pureza y efectividad.\nNN == == O Soluble en agua.\n— O Estable y seguro para\ny seg\nformulaciones.\nGENTAMINA Q60 PRESENTACIÓN: PRECIO:\nAntibacteriano de amplio espectro\npara uso cosmético 500 g $1 2.000\n500 g",
+    "sourceFile": "catalogo/gentamina.png",
+    "sourceHash": "417ab7360d1dd1a16e25afde21fccd65b8037bf2af41539faad35a504a641bf3"
+  },
+  {
+    "id": "GX-250",
+    "slug": "goma-xantana-250g",
+    "nombre": "Goma xantana",
+    "categoria": "Materias primas",
+    "precio": 10000,
+    "presentacion": "250 g",
+    "descripcion": "Espesante y estabilizante de origen natural utilizado para controlar la viscosidad, mejorar la textura y mantener partículas en suspensión.",
+    "usos": [
+      "Cosméticos",
+      "Productos de limpieza",
+      "Geles",
+      "Suspensiones"
+    ],
+    "caracteristicas": [
+      "Espesante eficiente",
+      "Estabilidad en amplio pH",
+      "Buena suspensión",
+      "Origen natural"
+    ],
+    "especificaciones": {
+      "Función": "Espesante/estabilizante",
+      "Apariencia": "Polvo crema",
+      "Dispersión": "En agua",
+      "Presentación": "Bolsa resellable"
+    },
+    "imagen": "/productos/goma-xantana-250g.png",
+    "sourceFile": "catalogo/goma xhantan 250.png",
+    "sourceHash": "3b3decf29a2fbebc9f532c1ea500f28013ab78a6e98000c25f9cede2c68adbd2"
+  },
+  {
+    "id": "GX-500",
+    "slug": "goma-xantana-500g",
+    "nombre": "Goma xantana",
+    "categoria": "Materias primas",
+    "precio": 17000,
+    "presentacion": "500 g",
+    "descripcion": "Espesante y estabilizante de origen natural utilizado para controlar la viscosidad, mejorar la textura y mantener partículas en suspensión.",
+    "usos": [
+      "Cosméticos",
+      "Productos de limpieza",
+      "Geles",
+      "Suspensiones"
+    ],
+    "caracteristicas": [
+      "Espesante eficiente",
+      "Estabilidad en amplio pH",
+      "Buena suspensión",
+      "Origen natural"
+    ],
+    "especificaciones": {
+      "Función": "Espesante/estabilizante",
+      "Apariencia": "Polvo crema",
+      "Dispersión": "En agua",
+      "Presentación": "Bolsa resellable"
+    },
+    "imagen": "/productos/goma-xantana-500g.png",
+    "sourceFile": "catalogo/goma xhantan 500.png",
+    "sourceHash": "43728756f03d862ecd327bfd5b0b56c1fbbb838a20ea3d3b6746ea991b2b0f18"
+  },
+  {
+    "id": "PVP-250",
+    "slug": "pvp-k30-250g",
+    "nombre": "PVP K30",
+    "categoria": "Químicos especializados",
+    "precio": 33000,
+    "presentacion": "250 g",
+    "descripcion": "Polímero soluble en agua utilizado como fijador, formador de película, aglutinante y estabilizante en formulaciones cosméticas y farmacéuticas.",
+    "usos": [
+      "Geles capilares",
+      "Sprays fijadores",
+      "Cosméticos",
+      "Recubrimientos"
+    ],
+    "caracteristicas": [
+      "Excelente formación de película",
+      "Soluble en agua",
+      "Buena fijación",
+      "Compatible con múltiples fórmulas"
+    ],
+    "especificaciones": {
+      "Función": "Formador de película",
+      "Grado": "K30",
+      "Apariencia": "Polvo blanco",
+      "Presentación": "Bolsa resellable"
+    },
+    "imagen": "/productos/pvp-k30-250g.png",
+    "sourceFile": "catalogo/pvp 250.png",
+    "sourceHash": "f5510f0f0c27d4694c57e99517dcb383430f3d760e78b39d92a3716478b0c1b8"
+  },
+  {
+    "id": "PVP-500",
+    "slug": "pvp-k30-500g",
+    "nombre": "PVP K30",
+    "categoria": "Químicos especializados",
+    "precio": 60000,
+    "presentacion": "500 g",
+    "descripcion": "Polímero soluble en agua utilizado como fijador, formador de película, aglutinante y estabilizante en formulaciones cosméticas y farmacéuticas.",
+    "usos": [
+      "Geles capilares",
+      "Sprays fijadores",
+      "Cosméticos",
+      "Recubrimientos"
+    ],
+    "caracteristicas": [
+      "Excelente formación de película",
+      "Soluble en agua",
+      "Buena fijación",
+      "Compatible con múltiples fórmulas"
+    ],
+    "especificaciones": {
+      "Función": "Formador de película",
+      "Grado": "K30",
+      "Apariencia": "Polvo blanco",
+      "Presentación": "Bolsa resellable"
+    },
+    "imagen": "/productos/pvp-k30-500g.png",
+    "sourceFile": "catalogo/pvp 500.png",
+    "sourceHash": "1004869c7bf0a88b2a3675423889fa99732bc8d0a46ef554f8dfcd62be1adc38"
+  },
+  {
+    "id": "TEX-1000",
+    "slug": "texapon-70-1000g",
+    "nombre": "Texapon 70",
+    "categoria": "Productos de limpieza",
+    "precio": 15000,
+    "presentacion": "1.000 g",
+    "descripcion": "Tensoactivo aniónico de alto poder detergente y espumante, ampliamente utilizado en shampoos, jabones líquidos, detergentes y productos de limpieza.",
+    "usos": [
+      "Jabones líquidos",
+      "Shampoo",
+      "Detergentes",
+      "Productos cosméticos"
+    ],
+    "caracteristicas": [
+      "Alto poder espumante",
+      "Excelente detergencia",
+      "Fácil incorporación",
+      "Estable en distintas formulaciones"
+    ],
+    "especificaciones": {
+      "Tipo": "Tensoactivo aniónico",
+      "Materia activa": "70 % aprox.",
+      "Apariencia": "Pasta viscosa",
+      "Presentación": "Bolsa sellada"
+    },
+    "imagen": "/productos/texapon-70-1000g.png",
+    "destacado": true,
+    "sourceFile": "catalogo/texapon70.png",
+    "sourceHash": "2e838ecfbfdb691e77c74244c395a56a449046389fb107d7b057d2e750fbfca3"
+  },
+  {
+    "id": "AUTO-331FB615",
+    "slug": "trietanolamina-tea-500-g",
+    "nombre": "Trietanolamina (TEA)",
+    "categoria": "Información pendiente",
+    "precio": 12000,
+    "presentacion": "500 g",
+    "descripcion": "Compuesto utilizado como regulador de pH, neutralizante y coemulsionante en formulaciones cosméticas, de limpieza e industriales.",
+    "usos": [],
+    "caracteristicas": [
+      "Agente alcalinizante.",
+      "Emulsionante y estabilizante.",
+      "Mejora la textura y estabilidad de las formulaciones.",
+      "Compatible con una amplia variedad de ingredientes."
+    ],
+    "especificaciones": {},
+    "imagen": "/productos/trietanolamina-tea-500-g.png",
+    "informacionPendiente": true,
+    "extraccionIncompleta": false,
+    "extractionVersion": 2,
+    "textoVisual": "“ é FÓRMULA:\n—= A NO Ana.\nC H 15 N O;\nCompuesto orgánico base\nde alta pureza. Incoloro,\n: viscoso, soluble en agua\nSUPRAQUIM Y x\nTRIETANOLAMINA-TEA/S008 y de alta estabilidad.\n$12.000\nINT\n500220\nO Agente alcalinizante.\n€ Emulsionante y estabilizante.\nN € Mejora la textura y estabilidad\nde las formulaciones.\n< € Compatible con una amplia\n- variedad de ingredientes.\nTRIETANOLAMINA (TEA) PRESENTACIÓN: PRECIO:\nAgente alcalinizante, emulsionante\ny estabilizante para uso cosmético 500 g $1 2.000\n500 g",
+    "sourceFile": "catalogo/tea.png",
+    "sourceHash": "331fb615249fc0f442e33424f2540c4744bbec6735bcc93c372a631da84a407e"
+  },
+  {
+    "id": "TYL-125",
+    "slug": "tylosa-125g",
+    "nombre": "Tylosa",
+    "categoria": "Químicos especializados",
+    "precio": 10000,
+    "presentacion": "125 g",
+    "descripcion": "Éter de celulosa utilizado como espesante, estabilizante y retenedor de agua en formulaciones cosméticas, adhesivas e industriales.",
+    "usos": [
+      "Pinturas",
+      "Adhesivos",
+      "Productos de limpieza",
+      "Mezclas cementicias"
+    ],
+    "caracteristicas": [
+      "Alta retención de agua",
+      "Control de viscosidad",
+      "Mejora la trabajabilidad",
+      "Estabiliza mezclas"
+    ],
+    "especificaciones": {
+      "Función": "Espesante celulósico",
+      "Apariencia": "Polvo blanco",
+      "Solubilidad": "Dispersable en agua",
+      "Presentación": "Bolsa resellable"
+    },
+    "imagen": "/productos/tylosa-125g.png",
+    "sourceFile": "catalogo/tylosa125.png",
+    "sourceHash": "e01af53b22decf32bbeba289beab892b226188755f4a80720e0a6e7bd9f57362"
+  },
+  {
+    "id": "TYL-250",
+    "slug": "tylosa-250g",
+    "nombre": "Tylosa",
+    "categoria": "Químicos especializados",
+    "precio": 18000,
+    "presentacion": "250 g",
+    "descripcion": "Éter de celulosa utilizado como espesante, estabilizante y retenedor de agua en formulaciones cosméticas, adhesivas e industriales.",
+    "usos": [
+      "Pinturas",
+      "Adhesivos",
+      "Productos de limpieza",
+      "Mezclas cementicias"
+    ],
+    "caracteristicas": [
+      "Alta retención de agua",
+      "Control de viscosidad",
+      "Mejora la trabajabilidad",
+      "Estabiliza mezclas"
+    ],
+    "especificaciones": {
+      "Función": "Espesante celulósico",
+      "Apariencia": "Polvo blanco",
+      "Solubilidad": "Dispersable en agua",
+      "Presentación": "Bolsa resellable"
+    },
+    "imagen": "/productos/tylosa-250g.png",
+    "sourceFile": "catalogo/tylosa250.png",
+    "sourceHash": "5ba0927ef062462944dbec462cfd99e1eadd857820d0cc361c8db4abc9e31df4"
+  },
+  {
+    "id": "TYL-500",
+    "slug": "tylosa-500g",
+    "nombre": "Tylosa",
+    "categoria": "Químicos especializados",
+    "precio": 35000,
+    "presentacion": "500 g",
+    "descripcion": "Éter de celulosa utilizado como espesante, estabilizante y retenedor de agua en formulaciones cosméticas, adhesivas e industriales.",
+    "usos": [
+      "Pinturas",
+      "Adhesivos",
+      "Productos de limpieza",
+      "Mezclas cementicias"
+    ],
+    "caracteristicas": [
+      "Alta retención de agua",
+      "Control de viscosidad",
+      "Mejora la trabajabilidad",
+      "Estabiliza mezclas"
+    ],
+    "especificaciones": {
+      "Función": "Espesante celulósico",
+      "Apariencia": "Polvo blanco",
+      "Solubilidad": "Dispersable en agua",
+      "Presentación": "Bolsa resellable"
+    },
+    "imagen": "/productos/tylosa-500g.png",
+    "sourceFile": "catalogo/tylosa 500.png",
+    "sourceHash": "a4db144ef05f4d55cb93392f18e72e7c6c305d28e04834b9b3ea2758504f3ac6"
+  },
+  {
+    "id": "VAS-1000",
+    "slug": "vaselina-blanca-1000g",
+    "nombre": "Vaselina blanca",
+    "categoria": "Materias primas",
+    "precio": 20000,
+    "presentacion": "1 litro",
+    "descripcion": "Mezcla purificada de hidrocarburos semisólidos con acción emoliente, protectora y oclusiva, utilizada en formulaciones cosméticas y farmacéuticas.",
+    "usos": [
+      "Bálsamos",
+      "Pomadas",
+      "Cremas protectoras",
+      "Productos capilares"
+    ],
+    "caracteristicas": [
+      "Forma barrera protectora",
+      "Suaviza la piel",
+      "Alta estabilidad",
+      "Grado cosmético"
+    ],
+    "especificaciones": {
+      "Tipo": "Petrolato blanco",
+      "Grado": "USP/cosmético",
+      "Apariencia": "Semisólido blanco",
+      "Presentación": "Recipiente plástico"
+    },
+    "imagen": "/productos/vaselina-blanca-1000g.png",
+    "destacado": true,
+    "sourceFile": "catalogo/vaselina 1000.png",
+    "sourceHash": "828f0e833b093f08b3eaf7f67c90d82c497a96d4dc558464d4b2aa6e21ae1b1e"
+  },
+  {
+    "id": "VIT-1000",
+    "slug": "vitamina-e-oleosa-1000g",
+    "nombre": "Vitamina E oleosa",
+    "categoria": "Materias primas",
+    "precio": 185000,
+    "presentacion": "1 kg",
+    "descripcion": "Antioxidante liposoluble a base de tocoferoles, utilizado para proteger fases oleosas y enriquecer formulaciones cosméticas y de cuidado personal.",
+    "usos": [
+      "Cremas",
+      "Sérums",
+      "Lociones",
+      "Aceites y productos capilares"
+    ],
+    "caracteristicas": [
+      "Acción antioxidante",
+      "Protege la formulación",
+      "Acondiciona la piel",
+      "Compatible con fase oleosa"
+    ],
+    "especificaciones": {
+      "Función": "Antioxidante",
+      "Solubilidad": "Fase oleosa",
+      "Apariencia": "Líquido viscoso",
+      "Presentación": "Envase plástico"
+    },
+    "imagen": "/productos/vitamina-e-oleosa-1000g.png",
+    "sourceFile": "catalogo/vitaminae.png",
+    "sourceHash": "5bcd99eb9a142f83c565523f640cc64d4cc430db8a0fa96ffc2ae4ee2c4047e7"
+  }
+]

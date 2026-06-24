@@ -1,0 +1,7 @@
+.next/
+node_modules/
+.pnpm-store/
+.ocr-cache/
+.codex-verify/
+*.log
+*.tsbuildinfo

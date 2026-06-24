@@ -1,0 +1,151 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-brand-purple: #9900cc;
+  --color-brand-deep: #870087;
+  --color-brand-yellow: #ffcc00;
+  --font-sans: "Geist", "Segoe UI", Arial, sans-serif;
+  --radius-sm: 0.625rem;
+  --radius-md: 0.875rem;
+  --radius-lg: 1.25rem;
+  --radius-xl: 1.5rem;
+}
+
+:root {
+  --background: #fdfbff;
+  --foreground: #2b1830;
+  --card: #ffffff;
+  --card-foreground: #2b1830;
+  --primary: #870087;
+  --primary-foreground: #ffffff;
+  --secondary: #f6eef8;
+  --secondary-foreground: #54115c;
+  --muted: #f6f2f7;
+  --muted-foreground: #756879;
+  --accent: #ffcc00;
+  --accent-foreground: #3d2d00;
+  --border: #eadfeb;
+  --input: #ded0e0;
+  --ring: #9900cc;
+}
+
+* {
+  border-color: var(--border);
+}
+
+html {
+  scroll-behavior: smooth;
+  background: var(--background);
+}
+
+body {
+  min-height: 100vh;
+  overflow-x: hidden;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: "Geist", "Segoe UI", Arial, sans-serif;
+  isolation: isolate;
+  text-rendering: optimizeLegibility;
+}
+
+body > main,
+body > footer {
+  position: relative;
+  z-index: 1;
+}
+
+.page-background {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 84% 10%, rgba(153, 0, 204, 0.16), transparent 30rem),
+    linear-gradient(90deg, rgba(253, 251, 255, 0.94) 0%, rgba(253, 251, 255, 0.86) 48%, rgba(253, 251, 255, 0.58) 100%);
+}
+
+.page-background::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("/marca/fondo-pagina-supraquim.jpg");
+  background-position: top 5.5rem right -2rem;
+  background-repeat: no-repeat;
+  background-size: min(70rem, 115vw) auto;
+  filter: saturate(1.08) contrast(1.04);
+  opacity: 0.48;
+}
+
+.page-background::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(253, 251, 255, 0.14) 0%, rgba(253, 251, 255, 0.62) 72%, rgba(253, 251, 255, 0.94) 100%),
+    linear-gradient(90deg, rgba(253, 251, 255, 0.78) 0%, rgba(253, 251, 255, 0.38) 54%, rgba(253, 251, 255, 0.08) 100%);
+}
+
+main > section.bg-white {
+  background-color: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(2px);
+}
+
+button,
+a,
+input,
+select {
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: rgba(153, 0, 204, 0.18);
+  color: #5a006d;
+}
+
+.shell {
+  width: min(100% - 2rem, 76rem);
+  margin-inline: auto;
+}
+
+.brand-grid {
+  background-image:
+    linear-gradient(rgba(153, 0, 204, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(153, 0, 204, 0.05) 1px, transparent 1px);
+  background-size: 34px 34px;
+}
+
+@media (min-width: 640px) {
+  .shell {
+    width: min(100% - 3rem, 76rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
