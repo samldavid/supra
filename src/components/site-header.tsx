@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Menu, MessageCircle, X } from "lucide-react";
 
+import { CartButton } from "@/components/cart/cart-button";
 import { Button } from "@/components/ui/button";
 import { getWhatsAppUrl } from "@/lib/whatsapp";
 
@@ -40,7 +41,8 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <div className="hidden lg:block">
+        <div className="hidden items-center gap-3 lg:flex">
+          <CartButton />
           <Button asChild variant="accent">
             <a href={getWhatsAppUrl()} target="_blank" rel="noreferrer">
               <MessageCircle /> Contactar
@@ -48,16 +50,18 @@ export function SiteHeader() {
           </Button>
         </div>
 
-        <Button
-          variant="outline"
-          size="icon"
-          className="lg:hidden"
-          aria-label={isOpen ? "Cerrar menú" : "Abrir menú"}
-          aria-expanded={isOpen}
-          onClick={() => setIsOpen((value) => !value)}
-        >
-          {isOpen ? <X /> : <Menu />}
-        </Button>
+        <div className="flex items-center gap-2 lg:hidden">
+          <CartButton compact />
+          <Button
+            variant="outline"
+            size="icon"
+            aria-label={isOpen ? "Cerrar menú" : "Abrir menú"}
+            aria-expanded={isOpen}
+            onClick={() => setIsOpen((value) => !value)}
+          >
+            {isOpen ? <X /> : <Menu />}
+          </Button>
+        </div>
       </div>
 
       {isOpen ? (

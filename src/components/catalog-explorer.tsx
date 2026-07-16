@@ -7,16 +7,17 @@ import { Search, SlidersHorizontal, X } from "lucide-react";
 import { ProductCard } from "@/components/product-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { categories, type Product } from "@/lib/products";
+import type { Product } from "@/lib/products";
 
 interface CatalogExplorerProps {
   products: Product[];
+  categories: string[];
   initialCategory?: string;
 }
 
 type SortOption = "featured" | "price-asc" | "price-desc" | "name";
 
-export function CatalogExplorer({ products, initialCategory = "Todos" }: CatalogExplorerProps) {
+export function CatalogExplorer({ products, categories, initialCategory = "Todos" }: CatalogExplorerProps) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState(initialCategory);
   const [sort, setSort] = useState<SortOption>("featured");

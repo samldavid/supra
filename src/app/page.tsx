@@ -8,7 +8,7 @@ import { ProductCard } from "@/components/product-card";
 import { SectionHeading } from "@/components/section-heading";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { categories, getCategoryCount, products } from "@/lib/products";
+import { getCategories, getCategoryCount, getProducts } from "@/lib/products";
 import { getWhatsAppUrl } from "@/lib/whatsapp";
 
 const values = [
@@ -29,10 +29,12 @@ const values = [
   },
 ] as const;
 
-export default function HomePage() {
+export default async function HomePage() {
+  const products = await getProducts();
+  const categories = getCategories(products);
   const featuredProducts = products.filter((product) => product.destacado).slice(0, 4);
   const categoryCounts = Object.fromEntries(
-    categories.map((category) => [category, getCategoryCount(category)]),
+    categories.map((category) => [category, getCategoryCount(products, category)]),
   );
   const organizationSchema = {
     "@context": "https://schema.org",

@@ -12,26 +12,29 @@ import {
   Tag,
 } from "lucide-react";
 
+import { AddToCartButton } from "@/components/cart/add-to-cart-button";
 import { ProductCard } from "@/components/product-card";
 import { ProductImageZoom } from "@/components/product-image-zoom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { getProductBySlug, getRelatedProducts, products } from "@/lib/products";
+import { getProductBySlug, getProducts, getRelatedProducts } from "@/lib/products";
 import { formatPrice } from "@/lib/utils";
-import { getWhatsAppUrl } from "@/lib/whatsapp";
+import { getProductWhatsAppUrl } from "@/lib/whatsapp";
 
 interface ProductPageProps {
   params: Promise<{ slug: string }>;
 }
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  const products = await getProducts();
   return products.map((product) => ({ slug: product.slug }));
 }
 
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const products = await getProducts();
+  const product = getProductBySlug(products, slug);
   if (!product) return {};
 
   return {
@@ -50,11 +53,12 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
 
 export default async function ProductPage({ params }: ProductPageProps) {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const products = await getProducts();
+  const product = getProductBySlug(products, slug);
   if (!product) notFound();
 
-  const related = getRelatedProducts(product);
-  const whatsappUrl = getWhatsAppUrl(`${product.nombre} (${product.presentacion})`);
+  const related = getRelatedProducts(products, product);
+  const whatsappUrl = getProductWhatsAppUrl(`${product.nombre} (${product.presentacion})`);
   const productSchema = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -123,6 +127,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
             </div>
 
             <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+              <AddToCartButton product={product} size="lg" className="flex-1" />
               <Button asChild variant="accent" size="lg" className="flex-1">
                 <a href={whatsappUrl} target="_blank" rel="noreferrer">
                   <MessageCircle /> Solicitar cotización

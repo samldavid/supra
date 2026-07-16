@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 
+import { CartDrawer } from "@/components/cart/cart-drawer";
+import { CartProvider } from "@/components/cart/cart-provider";
 import { FloatingWhatsApp } from "@/components/floating-whatsapp";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -54,11 +56,14 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="es">
       <body className="antialiased">
-        <div className="page-background" aria-hidden="true" />
-        <SiteHeader />
-        <main>{children}</main>
-        <SiteFooter />
-        <FloatingWhatsApp />
+        <CartProvider>
+          <div className="page-background" aria-hidden="true" />
+          <SiteHeader />
+          <main>{children}</main>
+          <SiteFooter />
+          <FloatingWhatsApp />
+          <CartDrawer />
+        </CartProvider>
       </body>
     </html>
   );

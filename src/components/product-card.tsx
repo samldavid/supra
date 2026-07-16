@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 
+import { AddToCartButton } from "@/components/cart/add-to-cart-button";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -41,18 +42,21 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
           <p className="mt-2 line-clamp-2 text-sm leading-6 text-muted-foreground">
             {product.descripcion || "Información pendiente"}
           </p>
-          <div className="mt-auto flex items-end justify-between gap-4 pt-5">
+          <div className="mt-auto flex flex-col gap-3 pt-5">
             <div>
               <p className="text-[11px] font-bold uppercase tracking-[.12em] text-muted-foreground">Precio</p>
               <p className="mt-1 text-lg font-black text-primary">
                 {product.precio === null ? "Información pendiente" : formatPrice(product.precio)}
               </p>
             </div>
-            <Button asChild variant="outline" size="icon" aria-label={`Ver ${product.nombre}`}>
-              <Link href={`/catalogo/${product.slug}`}>
-                <ArrowUpRight />
-              </Link>
-            </Button>
+            <div className="flex gap-2">
+              <AddToCartButton product={product} compact size="sm" className="flex-1" />
+              <Button asChild variant="outline" size="icon" aria-label={`Ver ${product.nombre}`}>
+                <Link href={`/catalogo/${product.slug}`}>
+                  <ArrowUpRight />
+                </Link>
+              </Button>
+            </div>
           </div>
         </div>
       </Card>

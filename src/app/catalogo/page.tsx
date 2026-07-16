@@ -3,7 +3,7 @@ import { FlaskConical } from "lucide-react";
 
 import { CatalogExplorer } from "@/components/catalog-explorer";
 import { Badge } from "@/components/ui/badge";
-import { categories, products } from "@/lib/products";
+import { getCategories, getProducts } from "@/lib/products";
 
 export const metadata: Metadata = {
   title: "Catálogo de productos",
@@ -22,8 +22,10 @@ interface CatalogPageProps {
 }
 
 export default async function CatalogPage({ searchParams }: CatalogPageProps) {
+  const products = await getProducts();
+  const categories = getCategories(products);
   const { categoria } = await searchParams;
-  const initialCategory = categoria && categories.includes(categoria as (typeof categories)[number])
+  const initialCategory = categoria && categories.includes(categoria)
     ? categoria
     : "Todos";
 
@@ -42,7 +44,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
       </section>
       <section className="py-10 sm:py-14">
         <div className="shell">
-          <CatalogExplorer products={products} initialCategory={initialCategory} />
+          <CatalogExplorer products={products} categories={categories} initialCategory={initialCategory} />
         </div>
       </section>
     </>

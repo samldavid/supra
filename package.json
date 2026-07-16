@@ -2,16 +2,21 @@
   "name": "supraquim-catalogo",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "sync:products": "node scripts/sync-products.mjs",
+    "seed:products": "node scripts/seed-products.mjs",
     "dev": "node scripts/dev.mjs",
     "prebuild": "pnpm sync:products",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test": "node --test --experimental-strip-types tests/*.test.ts"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.4",
+    "@supabase/ssr": "^0.12.3",
+    "@supabase/supabase-js": "^2.110.6",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.24",
@@ -19,7 +24,8 @@
     "next": "15.5.9",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "tailwind-merge": "^3.3.1"
+    "tailwind-merge": "^3.3.1",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.5",
