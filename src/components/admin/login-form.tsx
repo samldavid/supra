@@ -9,6 +9,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
+const adminAliasEmail = "admin@supraquim.local";
+
 export function LoginForm({ configured }: { configured: boolean }) {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -33,7 +35,8 @@ export function LoginForm({ configured }: { configured: boolean }) {
     setIsLoading(true);
     try {
       const supabase = createSupabaseBrowserClient();
-      const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
+      const loginEmail = email.trim().toLocaleLowerCase("es") === "admin" ? adminAliasEmail : email.trim();
+      const { error: authError } = await supabase.auth.signInWithPassword({ email: loginEmail, password });
 
       if (authError) {
         setError("Correo o contraseña inválidos.");
@@ -77,15 +80,16 @@ export function LoginForm({ configured }: { configured: boolean }) {
 
         <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
           <label className="block">
-            <span className="mb-2 block text-sm font-bold">Correo electrónico</span>
+            <span className="mb-2 block text-sm font-bold">Usuario o correo electrónico</span>
             <span className="relative block">
               <Mail className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
               <Input
-                type="email"
-                autoComplete="email"
+                type="text"
+                autoComplete="username"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 className="pl-11"
+                placeholder="admin"
                 disabled={isLoading}
                 required
               />
