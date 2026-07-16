@@ -1,10 +1,14 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
-import { hasSupabasePublicEnv, supabaseAnonKey, supabaseUrl } from "@/lib/supabase/config";
-
 export async function middleware(request: NextRequest) {
-  if (!hasSupabasePublicEnv()) {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() ?? "";
+  const supabaseAnonKey =
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim() ||
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY?.trim() ||
+    "";
+
+  if (!supabaseUrl || !supabaseAnonKey) {
     return NextResponse.next({ request });
   }
 
