@@ -1,3 +1,4 @@
+import { existsSync, readFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -5,6 +6,21 @@ import { createClient } from "@supabase/supabase-js";
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const productsPath = path.join(projectRoot, "src", "data", "generated-products.json");
+
+function loadEnvFile(filePath) {
+  if (!existsSync(filePath)) return;
+  const content = readFileSync(filePath, "utf8");
+  for (const line of content.split(/\r?\n/)) {
+    const match = line.match(/^\s*([^#=]+)=(.*)$/);
+    if (!match) continue;
+    const key = match[1].trim();
+    const value = match[2];
+    process.env[key] ??= value;
+  }
+}
+
+loadEnvFile(path.join(projectRoot, ".env.local"));
+loadEnvFile(path.join(projectRoot, ".env"));
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
