@@ -3,5 +3,7 @@ node_modules/
 .pnpm-store/
 .ocr-cache/
 .codex-verify/
+.env*
+!.env.example
 *.log
 *.tsbuildinfo
