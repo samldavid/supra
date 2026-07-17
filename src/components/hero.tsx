@@ -34,7 +34,7 @@ export function Hero({ productCount }: HeroProps) {
             <Sparkles className="size-3.5" /> Soluciones para formular, limpiar y crear
           </Badge>
           <h1 className="mt-6 max-w-3xl text-balance text-5xl leading-[.96] font-black tracking-[-0.055em] text-foreground sm:text-6xl lg:text-7xl">
-            La química de la <span className="text-primary">limpieza inteligente</span>
+            La fórmula <span className="text-primary">exacta</span>
           </h1>
           <p className="mt-6 max-w-2xl text-pretty text-lg leading-8 text-muted-foreground sm:text-xl">
             Productos químicos, envases y soluciones profesionales para hogar, negocio e industria.
