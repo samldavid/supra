@@ -3,13 +3,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowUpRight } from "lucide-react";
+import { AlertTriangle, ArrowUpRight } from "lucide-react";
 
 import { AddToCartButton } from "@/components/cart/add-to-cart-button";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import type { Product } from "@/lib/products";
+import { getChemicalWarning } from "@/lib/product-safety";
 import { formatPrice } from "@/lib/utils";
 
 interface ProductCardProps {
@@ -18,6 +19,8 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, priority = false }: ProductCardProps) {
+  const chemicalWarning = getChemicalWarning(product);
+
   return (
     <motion.article layout whileHover={{ y: -5 }} transition={{ duration: 0.22 }} className="h-full">
       <Card className="group flex h-full flex-col overflow-hidden transition hover:border-primary/20 hover:shadow-[0_20px_55px_rgba(75,15,85,.12)]">
@@ -42,6 +45,11 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
           <p className="mt-2 line-clamp-2 text-sm leading-6 text-muted-foreground">
             {product.descripcion || "Información pendiente"}
           </p>
+          {chemicalWarning ? (
+            <div className="mt-3 inline-flex w-fit items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-black text-amber-800">
+              <AlertTriangle className="size-3.5" /> Uso con precaución
+            </div>
+          ) : null}
           <div className="mt-auto flex flex-col gap-3 pt-5">
             <div>
               <p className="text-[11px] font-bold uppercase tracking-[.12em] text-muted-foreground">Precio</p>

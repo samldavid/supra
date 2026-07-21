@@ -9,6 +9,7 @@ export interface Product {
   usos: string[];
   caracteristicas: string[];
   especificaciones: Record<string, string>;
+  advertenciaQuimica?: string;
   imagen: string;
   destacado?: boolean;
   activo?: boolean;

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
+  AlertTriangle,
   ArrowLeft,
   Check,
   CheckCircle2,
@@ -18,6 +19,7 @@ import { ProductImageZoom } from "@/components/product-image-zoom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { getChemicalWarning, visibleSpecifications } from "@/lib/product-safety";
 import { getProductBySlug, getProducts, getRelatedProducts } from "@/lib/products";
 import { formatPrice } from "@/lib/utils";
 import { getProductWhatsAppUrl } from "@/lib/whatsapp";
@@ -59,6 +61,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   const related = getRelatedProducts(products, product);
   const whatsappUrl = getProductWhatsAppUrl(`${product.nombre} (${product.presentacion})`);
+  const chemicalWarning = getChemicalWarning(product);
+  const specificationEntries = visibleSpecifications(product);
   const productSchema = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -106,6 +110,15 @@ export default async function ProductPage({ params }: ProductPageProps) {
             {product.informacionPendiente ? (
               <div className="mt-5 rounded-2xl border border-accent/60 bg-accent/10 px-4 py-3 text-sm font-semibold text-foreground">
                 Información pendiente de validación editorial. Los datos mostrados fueron extraídos de la tarjeta publicada.
+              </div>
+            ) : null}
+
+            {chemicalWarning ? (
+              <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 shadow-[0_12px_35px_rgba(217,119,6,.08)]">
+                <p className="flex items-center gap-2 font-black">
+                  <AlertTriangle className="size-5 shrink-0" /> Advertencia química
+                </p>
+                <p className="mt-2 leading-6 font-semibold">{chemicalWarning}</p>
               </div>
             ) : null}
 
@@ -185,19 +198,19 @@ export default async function ProductPage({ params }: ProductPageProps) {
           <div className="overflow-x-auto">
             <table className="w-full min-w-[32rem] text-left text-sm">
               <tbody>
-                {Object.entries(product.especificaciones).map(([label, value], index) => (
+                {specificationEntries.map(([label, value], index) => (
                   <tr key={label} className={index % 2 ? "bg-muted/45" : "bg-white"}>
                     <th scope="row" className="w-2/5 px-6 py-4 font-black text-foreground sm:px-8">{label}</th>
                     <td className="px-6 py-4 text-muted-foreground sm:px-8">{value}</td>
                   </tr>
                 ))}
-                {!Object.keys(product.especificaciones).length ? (
+                {!specificationEntries.length ? (
                   <tr className="bg-white">
                     <th scope="row" className="w-2/5 px-6 py-4 font-black text-foreground sm:px-8">Información técnica</th>
                     <td className="px-6 py-4 text-muted-foreground sm:px-8">Información pendiente</td>
                   </tr>
                 ) : null}
-                <tr className={Object.keys(product.especificaciones).length % 2 ? "bg-muted/45" : "bg-white"}>
+                <tr className={specificationEntries.length % 2 ? "bg-muted/45" : "bg-white"}>
                   <th scope="row" className="px-6 py-4 font-black sm:px-8">Código</th>
                   <td className="px-6 py-4 font-mono text-muted-foreground sm:px-8">{product.id}</td>
                 </tr>

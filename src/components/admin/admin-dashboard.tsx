@@ -7,6 +7,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
+  AlertTriangle,
   CheckCircle2,
   ExternalLink,
   LogOut,
@@ -24,6 +25,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { defaultChemicalWarning, getChemicalWarning, mergeChemicalWarning, visibleSpecifications } from "@/lib/product-safety";
 import type { Product } from "@/lib/product-types";
 import { slugify } from "@/lib/slug";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
@@ -52,6 +54,7 @@ interface ProductFormState {
   orden: string;
   usos: string;
   caracteristicas: string;
+  advertenciaQuimica: string;
   especificaciones: string;
   informacionPendiente: boolean;
 }
@@ -86,6 +89,7 @@ const emptyForm: ProductFormState = {
   orden: "",
   usos: "",
   caracteristicas: "",
+  advertenciaQuimica: "",
   especificaciones: "{}",
   informacionPendiente: false,
 };
@@ -187,6 +191,32 @@ function generatedProductId(nombre: string) {
   return `${prefix}-${Date.now()}`;
 }
 
+function parseSpecifications(value: string) {
+  if (!value.trim() || value.trim() === "{}") return {};
+
+  try {
+    const parsed = JSON.parse(value);
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return {};
+
+    return Object.fromEntries(
+      Object.entries(parsed)
+        .map(([key, item]) => [key.trim(), String(item).trim()])
+        .filter(([key, item]) => key && item),
+    );
+  } catch {
+    return {};
+  }
+}
+
+function buildSpecifications(form: ProductFormState) {
+  const parsedSpecifications = parseSpecifications(form.especificaciones);
+  const baseSpecifications = Object.keys(parsedSpecifications).length
+    ? parsedSpecifications
+    : { Estado: "Información pendiente" };
+
+  return JSON.stringify(mergeChemicalWarning(baseSpecifications, form.advertenciaQuimica), null, 2);
+}
+
 function productToForm(product: Product): ProductFormState {
   return {
     id: product.id,
@@ -203,7 +233,8 @@ function productToForm(product: Product): ProductFormState {
     orden: product.orden === null || product.orden === undefined ? "" : String(product.orden),
     usos: product.usos.join("\n"),
     caracteristicas: product.caracteristicas.join("\n"),
-    especificaciones: JSON.stringify(product.especificaciones ?? {}, null, 2),
+    advertenciaQuimica: getChemicalWarning(product),
+    especificaciones: JSON.stringify(Object.fromEntries(visibleSpecifications(product)), null, 2),
     informacionPendiente: Boolean(product.informacionPendiente),
   };
 }
@@ -236,9 +267,8 @@ function prepareFormForSubmit(form: ProductFormState, products: Product[], editi
     descripcion: form.descripcion.trim() || "Información pendiente",
     usos: form.usos.trim() || "Información pendiente",
     caracteristicas: form.caracteristicas.trim() || "Información pendiente",
-    especificaciones: form.especificaciones.trim() && form.especificaciones.trim() !== "{}"
-      ? form.especificaciones.trim()
-      : JSON.stringify({ Estado: "Información pendiente" }, null, 2),
+    advertenciaQuimica: form.advertenciaQuimica.trim(),
+    especificaciones: buildSpecifications(form),
     informacionPendiente: hasPendingInfo,
   };
 }
@@ -259,7 +289,7 @@ function formToPayload(form: ProductFormState) {
     orden: form.orden,
     usos: form.usos,
     caracteristicas: form.caracteristicas,
-    especificaciones: form.especificaciones,
+    especificaciones: buildSpecifications(form),
     informacionPendiente: form.informacionPendiente,
   };
 }
@@ -354,7 +384,13 @@ export function AdminDashboard({ initialProducts, userEmail }: { initialProducts
   const filteredProducts = useMemo(() => {
     const normalizedQuery = query.trim().toLocaleLowerCase("es");
     return products.filter((product) => {
-      const matchesQuery = !normalizedQuery || [product.nombre, product.categoria, product.presentacion, product.descripcion]
+      const matchesQuery = !normalizedQuery || [
+        product.nombre,
+        product.categoria,
+        product.presentacion,
+        product.descripcion,
+        getChemicalWarning(product),
+      ]
         .join(" ")
         .toLocaleLowerCase("es")
         .includes(normalizedQuery);
@@ -420,7 +456,7 @@ export function AdminDashboard({ initialProducts, userEmail }: { initialProducts
     setForm(emptyForm);
     setIsFormOpen(true);
     setFeedback(null);
-    setFormFeedback({ kind: "info", message: "Completa nombre, descripción, precio y foto. Lo avanzado se genera automáticamente." });
+    setFormFeedback({ kind: "info", message: "Completa nombre, descripción, precio y foto. Si aplica, añade la advertencia química en la primera sección." });
   }
 
   function startEdit(product: Product) {
@@ -429,7 +465,7 @@ export function AdminDashboard({ initialProducts, userEmail }: { initialProducts
     setForm(productToForm(product));
     setIsFormOpen(true);
     setFeedback(null);
-    setFormFeedback({ kind: "info", message: "Edita lo necesario. Si dejas campos avanzados vacíos, se completan automáticamente." });
+    setFormFeedback({ kind: "info", message: "Edita lo necesario. La advertencia química aparece en la primera sección y lo avanzado se completa automáticamente." });
   }
 
   function closeForm() {
@@ -730,6 +766,11 @@ export function AdminDashboard({ initialProducts, userEmail }: { initialProducts
                         <div>
                           <p className="font-black">{product.nombre}</p>
                           <p className="text-xs font-semibold text-muted-foreground">{product.presentacion}</p>
+                          {getChemicalWarning(product) ? (
+                            <p className="mt-1 inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-black text-amber-800">
+                              <AlertTriangle className="size-3" /> Advertencia química
+                            </p>
+                          ) : null}
                         </div>
                       </div>
                     </td>
@@ -851,6 +892,51 @@ export function AdminDashboard({ initialProducts, userEmail }: { initialProducts
                     className="min-h-28 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none transition placeholder:text-muted-foreground focus:border-primary/50 focus:ring-4 focus:ring-ring/10"
                   />
                 </label>
+
+                <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4">
+                  <div className="flex gap-3">
+                    <AlertTriangle className="mt-0.5 size-5 shrink-0 text-amber-700" />
+                    <div>
+                      <p className="font-black text-amber-950">Advertencia química, opcional</p>
+                      <p className="mt-1 text-sm leading-6 text-amber-900/80">
+                        Si el producto requiere cuidado, añade aquí la advertencia. Aparecerá en el catálogo y en la ficha del producto.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="bg-white"
+                      onClick={() => updateForm("advertenciaQuimica", defaultChemicalWarning)}
+                      disabled={isSaving}
+                    >
+                      <AlertTriangle /> Añadir advertencia estándar
+                    </Button>
+                    {form.advertenciaQuimica ? (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => updateForm("advertenciaQuimica", "")}
+                        disabled={isSaving}
+                      >
+                        Quitar advertencia
+                      </Button>
+                    ) : null}
+                  </div>
+                  <label className="mt-4 block">
+                    <span className="mb-1 block text-xs font-black uppercase tracking-[.12em] text-amber-900/70">Texto visible de advertencia</span>
+                    <textarea
+                      value={form.advertenciaQuimica}
+                      onChange={(event) => updateForm("advertenciaQuimica", event.target.value)}
+                      placeholder={defaultChemicalWarning}
+                      disabled={isSaving}
+                      className="min-h-20 w-full rounded-xl border border-amber-200 bg-white px-4 py-3 text-sm outline-none transition placeholder:text-amber-900/45 focus:border-amber-400 focus:ring-4 focus:ring-amber-200/40 disabled:opacity-60"
+                    />
+                  </label>
+                </div>
               </section>
 
               <section className="space-y-4">
@@ -1039,6 +1125,7 @@ export function AdminDashboard({ initialProducts, userEmail }: { initialProducts
                     />
                   </label>
                 </div>
+
               </section>
 
               <details className="rounded-2xl border border-border bg-muted/45 p-4">

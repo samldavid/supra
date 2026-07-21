@@ -32,6 +32,7 @@ export function CatalogExplorer({ products, categories, initialCategory = "Todos
         product.presentacion,
         ...product.usos,
         ...product.caracteristicas,
+        ...Object.values(product.especificaciones ?? {}),
       ]
         .join(" ")
         .toLocaleLowerCase("es");
