@@ -6,6 +6,7 @@ import { productImagesBucket } from "@/lib/supabase/config";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 const allowedTypes = new Map([
   ["image/png", "png"],
@@ -14,6 +15,31 @@ const allowedTypes = new Map([
 ]);
 
 const maxFileSize = 5 * 1024 * 1024;
+
+function bytesStartWith(bytes: Uint8Array, signature: number[]) {
+  return signature.every((byte, index) => bytes[index] === byte);
+}
+
+async function detectImageExtension(file: File) {
+  const bytes = new Uint8Array(await file.slice(0, 16).arrayBuffer());
+
+  if (bytesStartWith(bytes, [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])) {
+    return "png";
+  }
+
+  if (bytesStartWith(bytes, [0xff, 0xd8, 0xff])) {
+    return "jpg";
+  }
+
+  const riff = String.fromCharCode(...bytes.slice(0, 4));
+  const webp = String.fromCharCode(...bytes.slice(8, 12));
+
+  if (riff === "RIFF" && webp === "WEBP") {
+    return "webp";
+  }
+
+  return null;
+}
 
 export async function POST(request: Request) {
   const { response } = await requireAdminApi();
@@ -32,8 +58,18 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Solo se permiten imágenes PNG, JPG o WebP." }, { status: 400 });
   }
 
+  if (file.size === 0) {
+    return NextResponse.json({ error: "La imagen está vacía. Selecciona otro archivo." }, { status: 400 });
+  }
+
   if (file.size > maxFileSize) {
     return NextResponse.json({ error: "La imagen no puede superar 5 MB." }, { status: 400 });
+  }
+
+  const detectedExtension = await detectImageExtension(file);
+
+  if (detectedExtension !== extension) {
+    return NextResponse.json({ error: "El archivo no parece ser una imagen válida PNG, JPG o WebP." }, { status: 400 });
   }
 
   const supabase = await createSupabaseServerClient();

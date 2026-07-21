@@ -1,19 +1,22 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import type { ChangeEvent, DragEvent, FormEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
+  CheckCircle2,
   ExternalLink,
-  ImagePlus,
   LogOut,
   Pencil,
   Plus,
   Power,
   Save,
   Search,
+  Sparkles,
   Trash2,
+  UploadCloud,
   X,
 } from "lucide-react";
 
@@ -23,7 +26,7 @@ import { Input } from "@/components/ui/input";
 import type { Product } from "@/lib/product-types";
 import { slugify } from "@/lib/slug";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
-import { formatPrice } from "@/lib/utils";
+import { cn, formatPrice } from "@/lib/utils";
 
 type StatusFilter = "todos" | "activos" | "inactivos";
 
@@ -46,6 +49,15 @@ interface ProductFormState {
   informacionPendiente: boolean;
 }
 
+interface ProductSuggestion {
+  label: string;
+  category: string;
+  presentation: string;
+  usos: string[];
+  caracteristicas: string[];
+  especificaciones: Record<string, string>;
+}
+
 const emptyForm: ProductFormState = {
   id: "",
   slug: "",
@@ -64,6 +76,89 @@ const emptyForm: ProductFormState = {
   especificaciones: "{}",
   informacionPendiente: false,
 };
+
+const preferredCategories = [
+  "Productos de limpieza",
+  "Materias primas",
+  "Insumos industriales",
+  "Químicos especializados",
+  "Envases",
+  "Fragancias",
+  "Información pendiente",
+];
+
+const categoryHints = new Map([
+  ["Productos de limpieza", "Jabones, detergentes y cuidado del hogar."],
+  ["Materias primas", "Bases e ingredientes para formular."],
+  ["Insumos industriales", "Soluciones para procesos y producción."],
+  ["Químicos especializados", "Productos de uso técnico específico."],
+  ["Envases", "Presentación y protección de producto."],
+  ["Fragancias", "Aromas e identidad sensorial."],
+  ["Información pendiente", "Para guardar sin inventar datos."],
+]);
+
+const presentationOptions = [
+  "1 galón",
+  "1 litro",
+  "500 ml",
+  "250 ml",
+  "1 kg",
+  "500 g",
+  "250 g",
+  "125 g",
+];
+
+const imageMimeTypes = ["image/png", "image/jpeg", "image/webp"];
+const maxImageSize = 5 * 1024 * 1024;
+
+const cleaningSuggestion: ProductSuggestion = {
+  label: "Sugerencias para producto de limpieza",
+  category: "Productos de limpieza",
+  presentation: "1 galón",
+  usos: ["Lavado de ropa", "Remoción de manchas", "Limpieza profunda", "Uso doméstico o comercial"],
+  caracteristicas: ["Alto rendimiento", "Aroma fresco", "Fácil dosificación", "Listo para usar"],
+  especificaciones: {
+    Tipo: "Jabón líquido",
+    Uso: "Ropa",
+    Color: "Información pendiente",
+    Fragancia: "Información pendiente",
+  },
+};
+
+const generalSuggestion: ProductSuggestion = {
+  label: "Sugerencias básicas",
+  category: "Información pendiente",
+  presentation: "Información pendiente",
+  usos: ["Información pendiente"],
+  caracteristicas: ["Información pendiente"],
+  especificaciones: {
+    Tipo: "Información pendiente",
+    Uso: "Información pendiente",
+  },
+};
+
+function normalizeText(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLocaleLowerCase("es");
+}
+
+function getSuggestion(nombre: string, categoria: string): ProductSuggestion {
+  const searchable = normalizeText(`${nombre} ${categoria}`);
+
+  if (/(limpieza|jabon|detergente|ropa|lavar|lava ropa|shampoo|desinfectante)/.test(searchable)) {
+    return cleaningSuggestion;
+  }
+
+  return generalSuggestion;
+}
+
+function formatFileSize(size: number) {
+  if (size < 1024) return `${size} B`;
+  if (size < 1024 * 1024) return `${(size / 1024).toFixed(0)} KB`;
+  return `${(size / (1024 * 1024)).toFixed(1)} MB`;
+}
 
 function productToForm(product: Product): ProductFormState {
   return {
@@ -87,14 +182,23 @@ function productToForm(product: Product): ProductFormState {
 }
 
 function formToPayload(form: ProductFormState) {
+  const categoria = form.categoria.trim() || "Información pendiente";
+  const presentacion = form.presentacion.trim() || "Información pendiente";
+  const hasPendingInfo =
+    form.informacionPendiente ||
+    categoria === "Información pendiente" ||
+    presentacion === "Información pendiente" ||
+    !form.descripcion.trim() ||
+    !form.precio.trim();
+
   return {
     id: form.id.trim() || `PROD-${Date.now()}`,
-    slug: form.slug.trim() || slugify(`${form.nombre} ${form.presentacion}`),
-    nombre: form.nombre,
-    categoria: form.categoria,
+    slug: form.slug.trim() || slugify(`${form.nombre} ${presentacion}`),
+    nombre: form.nombre.trim(),
+    categoria,
     precio: form.precio,
-    presentacion: form.presentacion,
-    descripcion: form.descripcion,
+    presentacion,
+    descripcion: form.descripcion.trim(),
     imagen: form.imagen,
     activo: form.activo,
     destacado: form.destacado,
@@ -102,13 +206,14 @@ function formToPayload(form: ProductFormState) {
     orden: form.orden,
     usos: form.usos,
     caracteristicas: form.caracteristicas,
-    especificaciones: form.especificaciones,
-    informacionPendiente: form.informacionPendiente,
+    especificaciones: form.especificaciones.trim() || "{}",
+    informacionPendiente: hasPendingInfo,
   };
 }
 
 export function AdminDashboard({ initialProducts, userEmail }: { initialProducts: Product[]; userEmail: string }) {
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [products, setProducts] = useState(initialProducts);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("Todas");
@@ -116,11 +221,34 @@ export function AdminDashboard({ initialProducts, userEmail }: { initialProducts
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<ProductFormState>(emptyForm);
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState("");
+  const [isDraggingImage, setIsDraggingImage] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
 
-  const categories = useMemo(() => Array.from(new Set(products.map((product) => product.categoria))).sort((a, b) => a.localeCompare(b, "es")), [products]);
+  useEffect(() => {
+    if (!imageFile) {
+      setImagePreviewUrl("");
+      return;
+    }
+
+    const objectUrl = URL.createObjectURL(imageFile);
+    setImagePreviewUrl(objectUrl);
+
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [imageFile]);
+
+  const categories = useMemo(
+    () => Array.from(new Set(products.map((product) => product.categoria))).sort((a, b) => a.localeCompare(b, "es")),
+    [products],
+  );
+
+  const categoryOptions = useMemo(
+    () => Array.from(new Set([...preferredCategories, ...categories].filter(Boolean))),
+    [categories],
+  );
+
   const metrics = useMemo(() => ({
     total: products.length,
     active: products.filter((product) => product.activo !== false).length,
@@ -144,14 +272,52 @@ export function AdminDashboard({ initialProducts, userEmail }: { initialProducts
     });
   }, [category, products, query, statusFilter]);
 
+  const suggestion = useMemo(() => getSuggestion(form.nombre, form.categoria), [form.categoria, form.nombre]);
+  const previewImage = imagePreviewUrl || form.imagen;
+  const formattedPreviewPrice = form.precio.trim() ? formatPrice(Number(form.precio.replace(/[^\d.-]/g, "")) || 0) : "Pendiente";
+
   function updateForm<K extends keyof ProductFormState>(key: K, value: ProductFormState[K]) {
     setForm((current) => {
       const next = { ...current, [key]: value };
-      if ((key === "nombre" || key === "presentacion") && !current.slug) {
+      if ((key === "nombre" || key === "presentacion") && !editingId) {
         next.slug = slugify(`${next.nombre} ${next.presentacion}`);
       }
       return next;
     });
+  }
+
+  function selectImage(file: File | null) {
+    if (!file) {
+      setImageFile(null);
+      return;
+    }
+
+    if (!imageMimeTypes.includes(file.type)) {
+      setImageFile(null);
+      setError("La imagen debe ser PNG, JPG o WebP.");
+      return;
+    }
+
+    if (file.size > maxImageSize) {
+      setImageFile(null);
+      setError("La imagen no puede superar 5 MB.");
+      return;
+    }
+
+    setImageFile(file);
+    setError("");
+    setNotice("Imagen lista para subir. Se guardará al guardar el producto.");
+  }
+
+  function handleImageChange(event: ChangeEvent<HTMLInputElement>) {
+    selectImage(event.target.files?.[0] ?? null);
+    event.target.value = "";
+  }
+
+  function handleImageDrop(event: DragEvent<HTMLLabelElement>) {
+    event.preventDefault();
+    setIsDraggingImage(false);
+    selectImage(event.dataTransfer.files?.[0] ?? null);
   }
 
   function startCreate() {
@@ -170,8 +336,34 @@ export function AdminDashboard({ initialProducts, userEmail }: { initialProducts
     setError("");
   }
 
+  function applySuggestedDetails() {
+    setForm((current) => {
+      const nextPresentation = current.presentacion.trim() || suggestion.presentation;
+      const nextCategory = current.categoria.trim() || suggestion.category;
+      return {
+        ...current,
+        categoria: nextCategory,
+        presentacion: nextPresentation,
+        usos: current.usos.trim() ? current.usos : suggestion.usos.join("\n"),
+        caracteristicas: current.caracteristicas.trim() ? current.caracteristicas : suggestion.caracteristicas.join("\n"),
+        especificaciones: current.especificaciones.trim() && current.especificaciones.trim() !== "{}"
+          ? current.especificaciones
+          : JSON.stringify({ ...suggestion.especificaciones, Presentación: nextPresentation }, null, 2),
+        informacionPendiente: current.informacionPendiente || nextCategory === "Información pendiente" || nextPresentation === "Información pendiente",
+        slug: editingId ? current.slug : slugify(`${current.nombre} ${nextPresentation}`),
+      };
+    });
+    setNotice("Sugerencias aplicadas. Puedes ajustar cualquier dato antes de guardar.");
+    setError("");
+  }
+
   async function uploadImageIfNeeded() {
-    if (!imageFile) return form.imagen;
+    if (!imageFile) {
+      if (!form.imagen.trim()) {
+        throw new Error("Sube una imagen del producto o pega una URL pública en opciones avanzadas.");
+      }
+      return form.imagen;
+    }
 
     const formData = new FormData();
     formData.append("file", imageFile);
@@ -185,11 +377,17 @@ export function AdminDashboard({ initialProducts, userEmail }: { initialProducts
     return result.url as string;
   }
 
-  async function saveProduct(event: React.FormEvent<HTMLFormElement>) {
+  async function saveProduct(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setIsSaving(true);
     setNotice("");
     setError("");
+
+    if (!form.nombre.trim()) {
+      setError("Escribe el nombre del producto antes de guardar.");
+      return;
+    }
+
+    setIsSaving(true);
 
     try {
       const imageUrl = await uploadImageIfNeeded();
@@ -313,7 +511,7 @@ export function AdminDashboard({ initialProducts, userEmail }: { initialProducts
         </div>
       ) : null}
 
-      <div className="mt-8 grid gap-8 xl:grid-cols-[1fr_28rem]">
+      <div className="mt-8 grid gap-8 xl:grid-cols-[minmax(0,1fr)_32rem]">
         <div>
           <div className="rounded-[1.5rem] border border-border bg-white p-4 shadow-[0_12px_40px_rgba(41,22,51,.06)]">
             <div className="grid gap-3 lg:grid-cols-[1fr_auto_auto]">
@@ -388,97 +586,327 @@ export function AdminDashboard({ initialProducts, userEmail }: { initialProducts
         </div>
 
         <Card>
-          <CardContent className="p-5">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-xs font-black uppercase tracking-[.16em] text-primary">{editingId ? "Editar producto" : "Nuevo producto"}</p>
-                <h2 className="mt-1 text-2xl font-black">{editingId ? form.nombre : "Crear producto"}</h2>
+          <CardContent className="p-0">
+            <div className="rounded-t-[1.5rem] border-b border-border bg-gradient-to-br from-primary/8 via-white to-accent/12 p-5">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[.16em] text-primary">{editingId ? "Editar producto" : "Nuevo producto"}</p>
+                  <h2 className="mt-1 text-2xl font-black">{editingId ? form.nombre : "Carga rápida guiada"}</h2>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Escribe los datos principales, sube la foto y completa lo demás con clics.
+                  </p>
+                </div>
+                {editingId ? (
+                  <button type="button" onClick={startCreate} aria-label="Cancelar edición" className="rounded-xl p-2 text-muted-foreground hover:bg-muted hover:text-primary">
+                    <X className="size-5" />
+                  </button>
+                ) : null}
               </div>
-              {editingId ? (
-                <button type="button" onClick={startCreate} aria-label="Cancelar edición" className="rounded-xl p-2 text-muted-foreground hover:bg-muted hover:text-primary">
-                  <X className="size-5" />
-                </button>
-              ) : null}
+
+              <div className="mt-4 rounded-2xl border border-accent/40 bg-accent/15 p-4 text-sm">
+                <div className="flex gap-3">
+                  <Sparkles className="mt-0.5 size-5 shrink-0 text-primary" />
+                  <div>
+                    <p className="font-black text-foreground">Modo sencillo para productos nuevos</p>
+                    <p className="mt-1 text-muted-foreground">
+                      Para el jabón Arial: nombre, descripción, precio 15000, foto, categoría “Productos de limpieza” y presentación “1 galón”.
+                    </p>
+                    <Button type="button" variant="outline" size="sm" className="mt-3 bg-white" onClick={applySuggestedDetails}>
+                      <Sparkles /> {suggestion.label}
+                    </Button>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <form className="mt-5 space-y-4" onSubmit={saveProduct}>
-              <div className="grid gap-3 sm:grid-cols-2">
-                <label className="block">
-                  <span className="mb-1 block text-xs font-black uppercase tracking-[.12em] text-muted-foreground">ID</span>
-                  <Input value={form.id} onChange={(event) => updateForm("id", event.target.value)} readOnly={Boolean(editingId)} required />
-                </label>
-                <label className="block">
-                  <span className="mb-1 block text-xs font-black uppercase tracking-[.12em] text-muted-foreground">Slug</span>
-                  <Input value={form.slug} onChange={(event) => updateForm("slug", event.target.value)} />
-                </label>
-              </div>
-              <label className="block">
-                <span className="mb-1 block text-xs font-black uppercase tracking-[.12em] text-muted-foreground">Nombre</span>
-                <Input value={form.nombre} onChange={(event) => updateForm("nombre", event.target.value)} required />
-              </label>
-              <div className="grid gap-3 sm:grid-cols-2">
-                <label className="block">
-                  <span className="mb-1 block text-xs font-black uppercase tracking-[.12em] text-muted-foreground">Categoría</span>
-                  <Input value={form.categoria} onChange={(event) => updateForm("categoria", event.target.value)} required list="admin-categories" />
-                  <datalist id="admin-categories">{categories.map((item) => <option key={item} value={item} />)}</datalist>
-                </label>
-                <label className="block">
-                  <span className="mb-1 block text-xs font-black uppercase tracking-[.12em] text-muted-foreground">Presentación</span>
-                  <Input value={form.presentacion} onChange={(event) => updateForm("presentacion", event.target.value)} required />
-                </label>
-              </div>
-              <label className="block">
-                <span className="mb-1 block text-xs font-black uppercase tracking-[.12em] text-muted-foreground">Descripción</span>
-                <textarea value={form.descripcion} onChange={(event) => updateForm("descripcion", event.target.value)} className="min-h-24 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none focus:border-primary/50 focus:ring-4 focus:ring-ring/10" />
-              </label>
-              <div className="grid gap-3 sm:grid-cols-2">
-                <label className="block">
-                  <span className="mb-1 block text-xs font-black uppercase tracking-[.12em] text-muted-foreground">Precio COP</span>
-                  <Input inputMode="numeric" value={form.precio} onChange={(event) => updateForm("precio", event.target.value)} />
-                </label>
-                <label className="block">
-                  <span className="mb-1 block text-xs font-black uppercase tracking-[.12em] text-muted-foreground">Stock</span>
-                  <Input inputMode="numeric" value={form.stock} onChange={(event) => updateForm("stock", event.target.value)} />
-                </label>
-              </div>
-              <label className="block">
-                <span className="mb-1 block text-xs font-black uppercase tracking-[.12em] text-muted-foreground">Imagen</span>
-                <Input value={form.imagen} onChange={(event) => updateForm("imagen", event.target.value)} placeholder="/productos/archivo.png o URL pública" required />
-              </label>
-              <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-dashed border-primary/30 bg-primary/4 px-4 py-3 text-sm font-bold text-primary">
-                <ImagePlus className="size-5" />
-                <span>{imageFile ? imageFile.name : "Subir nueva imagen"}</span>
-                <input type="file" accept="image/png,image/jpeg,image/webp" className="sr-only" onChange={(event) => setImageFile(event.target.files?.[0] ?? null)} />
-              </label>
-              {(imageFile || form.imagen) ? (
-                <div className="relative aspect-[4/3] overflow-hidden rounded-xl border border-border bg-muted">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={imageFile ? URL.createObjectURL(imageFile) : form.imagen} alt="Vista previa del producto" className="h-full w-full object-contain" />
+            <form className="space-y-6 p-5" onSubmit={saveProduct}>
+              <section className="space-y-4">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[.16em] text-primary">1. Datos visibles</p>
+                  <p className="mt-1 text-sm text-muted-foreground">Estos son los textos principales que verá el cliente.</p>
                 </div>
-              ) : null}
-              <div className="grid gap-3 sm:grid-cols-2">
+
                 <label className="block">
-                  <span className="mb-1 block text-xs font-black uppercase tracking-[.12em] text-muted-foreground">Usos, uno por línea</span>
-                  <textarea value={form.usos} onChange={(event) => updateForm("usos", event.target.value)} className="min-h-24 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none focus:border-primary/50 focus:ring-4 focus:ring-ring/10" />
+                  <span className="mb-1 block text-xs font-black uppercase tracking-[.12em] text-muted-foreground">Nombre del producto</span>
+                  <Input
+                    value={form.nombre}
+                    onChange={(event) => updateForm("nombre", event.target.value)}
+                    placeholder="Ej: JABÓN LÍQUIDO PARA ROPA (ARIAL)"
+                    required
+                  />
                 </label>
+
                 <label className="block">
-                  <span className="mb-1 block text-xs font-black uppercase tracking-[.12em] text-muted-foreground">Características</span>
-                  <textarea value={form.caracteristicas} onChange={(event) => updateForm("caracteristicas", event.target.value)} className="min-h-24 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none focus:border-primary/50 focus:ring-4 focus:ring-ring/10" />
+                  <span className="mb-1 block text-xs font-black uppercase tracking-[.12em] text-muted-foreground">Descripción comercial</span>
+                  <textarea
+                    value={form.descripcion}
+                    onChange={(event) => updateForm("descripcion", event.target.value)}
+                    placeholder="Describe para qué sirve y qué beneficio tiene."
+                    className="min-h-28 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none transition placeholder:text-muted-foreground focus:border-primary/50 focus:ring-4 focus:ring-ring/10"
+                  />
                 </label>
-              </div>
-              <label className="block">
-                <span className="mb-1 block text-xs font-black uppercase tracking-[.12em] text-muted-foreground">Especificaciones JSON</span>
-                <textarea value={form.especificaciones} onChange={(event) => updateForm("especificaciones", event.target.value)} className="min-h-24 w-full rounded-xl border border-input bg-background px-4 py-3 font-mono text-xs outline-none focus:border-primary/50 focus:ring-4 focus:ring-ring/10" />
-              </label>
-              <div className="grid gap-2 text-sm font-semibold sm:grid-cols-2">
-                <label className="flex items-center gap-2"><input type="checkbox" checked={form.activo} onChange={(event) => updateForm("activo", event.target.checked)} /> Activo</label>
-                <label className="flex items-center gap-2"><input type="checkbox" checked={form.destacado} onChange={(event) => updateForm("destacado", event.target.checked)} /> Destacado</label>
-                <label className="flex items-center gap-2"><input type="checkbox" checked={form.informacionPendiente} onChange={(event) => updateForm("informacionPendiente", event.target.checked)} /> Información pendiente</label>
-                <label className="flex items-center gap-2">
-                  Orden
-                  <input value={form.orden} onChange={(event) => updateForm("orden", event.target.value)} className="h-9 w-20 rounded-lg border border-input bg-background px-2 outline-none" />
+
+                <label className="block">
+                  <span className="mb-1 block text-xs font-black uppercase tracking-[.12em] text-muted-foreground">Precio de referencia COP</span>
+                  <Input
+                    inputMode="numeric"
+                    value={form.precio}
+                    onChange={(event) => updateForm("precio", event.target.value.replace(/[^\d]/g, ""))}
+                    placeholder="Ej: 15000"
+                  />
+                  <span className="mt-1 block text-xs font-semibold text-muted-foreground">Vista previa: {formattedPreviewPrice}</span>
                 </label>
-              </div>
+              </section>
+
+              <section className="space-y-4">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[.16em] text-primary">2. Foto del producto</p>
+                  <p className="mt-1 text-sm text-muted-foreground">Arrastra la imagen o haz clic para seleccionarla. PNG, JPG o WebP hasta 5 MB.</p>
+                </div>
+
+                <label
+                  className={cn(
+                    "flex cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-primary/35 bg-primary/5 px-4 py-6 text-center transition hover:border-primary hover:bg-primary/8",
+                    isDraggingImage && "border-primary bg-primary/10",
+                  )}
+                  onDragEnter={(event) => {
+                    event.preventDefault();
+                    setIsDraggingImage(true);
+                  }}
+                  onDragOver={(event) => event.preventDefault()}
+                  onDragLeave={() => setIsDraggingImage(false)}
+                  onDrop={handleImageDrop}
+                >
+                  <UploadCloud className="size-8 text-primary" />
+                  <span className="text-sm font-black text-primary">
+                    {imageFile ? imageFile.name : "Subir o arrastrar imagen"}
+                  </span>
+                  <span className="text-xs font-semibold text-muted-foreground">
+                    {imageFile ? `${formatFileSize(imageFile.size)} listo para guardar` : "La URL se genera automáticamente en Supabase al guardar."}
+                  </span>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp"
+                    className="sr-only"
+                    onChange={handleImageChange}
+                  />
+                </label>
+
+                {previewImage ? (
+                  <div className="overflow-hidden rounded-2xl border border-border bg-muted">
+                    <div className="relative aspect-[4/3]">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={previewImage} alt="Vista previa del producto" className="h-full w-full object-contain" />
+                    </div>
+                    <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border bg-white px-4 py-3 text-xs font-semibold text-muted-foreground">
+                      <span>{imageFile ? "Nueva imagen seleccionada" : "Imagen actual"}</span>
+                      {imageFile ? (
+                        <button type="button" className="font-black text-primary hover:underline" onClick={() => setImageFile(null)}>
+                          Quitar selección
+                        </button>
+                      ) : null}
+                    </div>
+                  </div>
+                ) : null}
+              </section>
+
+              <section className="space-y-4">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[.16em] text-primary">3. Clasificación con clic</p>
+                  <p className="mt-1 text-sm text-muted-foreground">Si no estás seguro, usa “Información pendiente” y no se inventan datos.</p>
+                </div>
+
+                <div>
+                  <span className="mb-2 block text-xs font-black uppercase tracking-[.12em] text-muted-foreground">Categoría</span>
+                  <div className="grid gap-2">
+                    {categoryOptions.map((option) => {
+                      const selected = form.categoria === option;
+                      return (
+                        <button
+                          key={option}
+                          type="button"
+                          aria-pressed={selected}
+                          onClick={() => updateForm("categoria", option)}
+                          className={cn(
+                            "rounded-2xl border px-4 py-3 text-left transition focus:outline-none focus:ring-4 focus:ring-ring/10",
+                            selected ? "border-primary bg-primary/8 text-primary" : "border-border bg-white hover:border-primary/30 hover:bg-primary/5",
+                          )}
+                        >
+                          <span className="flex items-center justify-between gap-3">
+                            <span className="font-black">{option}</span>
+                            {selected ? <CheckCircle2 className="size-5" /> : null}
+                          </span>
+                          <span className="mt-1 block text-xs font-semibold text-muted-foreground">{categoryHints.get(option) ?? "Categoría existente del catálogo."}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <Input
+                    value={form.categoria}
+                    onChange={(event) => updateForm("categoria", event.target.value)}
+                    placeholder="O escribe otra categoría"
+                    className="mt-3"
+                  />
+                </div>
+
+                <div>
+                  <span className="mb-2 block text-xs font-black uppercase tracking-[.12em] text-muted-foreground">Presentación</span>
+                  <div className="flex flex-wrap gap-2">
+                    {presentationOptions.map((option) => {
+                      const selected = form.presentacion === option;
+                      return (
+                        <button
+                          key={option}
+                          type="button"
+                          aria-pressed={selected}
+                          onClick={() => updateForm("presentacion", option)}
+                          className={cn(
+                            "rounded-full border px-3.5 py-2 text-sm font-black transition focus:outline-none focus:ring-4 focus:ring-ring/10",
+                            selected ? "border-primary bg-primary text-white" : "border-border bg-white text-foreground hover:border-primary/30 hover:bg-primary/5",
+                          )}
+                        >
+                          {option}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <Input
+                    value={form.presentacion}
+                    onChange={(event) => updateForm("presentacion", event.target.value)}
+                    placeholder="O escribe otra presentación"
+                    className="mt-3"
+                  />
+                </div>
+              </section>
+
+              <section className="space-y-4">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[.16em] text-primary">4. Detalles opcionales</p>
+                  <p className="mt-1 text-sm text-muted-foreground">Puedes usar el botón de sugerencias y luego ajustar lo que haga falta.</p>
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <label className="block">
+                    <span className="mb-1 block text-xs font-black uppercase tracking-[.12em] text-muted-foreground">Usos visibles</span>
+                    <textarea
+                      value={form.usos}
+                      onChange={(event) => updateForm("usos", event.target.value)}
+                      placeholder="Uno por línea"
+                      className="min-h-24 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none transition placeholder:text-muted-foreground focus:border-primary/50 focus:ring-4 focus:ring-ring/10"
+                    />
+                  </label>
+                  <label className="block">
+                    <span className="mb-1 block text-xs font-black uppercase tracking-[.12em] text-muted-foreground">Características visibles</span>
+                    <textarea
+                      value={form.caracteristicas}
+                      onChange={(event) => updateForm("caracteristicas", event.target.value)}
+                      placeholder="Una por línea"
+                      className="min-h-24 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none transition placeholder:text-muted-foreground focus:border-primary/50 focus:ring-4 focus:ring-ring/10"
+                    />
+                  </label>
+                </div>
+              </section>
+
+              <section className="space-y-3">
+                <p className="text-xs font-black uppercase tracking-[.16em] text-primary">5. Estado en la tienda</p>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  <button
+                    type="button"
+                    aria-pressed={form.activo}
+                    onClick={() => updateForm("activo", true)}
+                    className={cn(
+                      "rounded-2xl border px-4 py-3 text-left transition focus:outline-none focus:ring-4 focus:ring-ring/10",
+                      form.activo ? "border-green-300 bg-green-50 text-green-700" : "border-border bg-white hover:bg-muted",
+                    )}
+                  >
+                    <span className="font-black">Visible</span>
+                    <span className="mt-1 block text-xs font-semibold text-muted-foreground">Aparece en el catálogo.</span>
+                  </button>
+                  <button
+                    type="button"
+                    aria-pressed={!form.activo}
+                    onClick={() => updateForm("activo", false)}
+                    className={cn(
+                      "rounded-2xl border px-4 py-3 text-left transition focus:outline-none focus:ring-4 focus:ring-ring/10",
+                      !form.activo ? "border-border bg-muted text-muted-foreground" : "border-border bg-white hover:bg-muted",
+                    )}
+                  >
+                    <span className="font-black">Guardar sin publicar</span>
+                    <span className="mt-1 block text-xs font-semibold text-muted-foreground">Queda oculto al cliente.</span>
+                  </button>
+                  <button
+                    type="button"
+                    aria-pressed={form.destacado}
+                    onClick={() => updateForm("destacado", !form.destacado)}
+                    className={cn(
+                      "rounded-2xl border px-4 py-3 text-left transition focus:outline-none focus:ring-4 focus:ring-ring/10",
+                      form.destacado ? "border-accent bg-accent/20 text-accent-foreground" : "border-border bg-white hover:bg-accent/10",
+                    )}
+                  >
+                    <span className="font-black">Destacado</span>
+                    <span className="mt-1 block text-xs font-semibold text-muted-foreground">Resalta el producto cuando aplique.</span>
+                  </button>
+                  <button
+                    type="button"
+                    aria-pressed={form.informacionPendiente}
+                    onClick={() => updateForm("informacionPendiente", !form.informacionPendiente)}
+                    className={cn(
+                      "rounded-2xl border px-4 py-3 text-left transition focus:outline-none focus:ring-4 focus:ring-ring/10",
+                      form.informacionPendiente ? "border-primary bg-primary/8 text-primary" : "border-border bg-white hover:bg-primary/5",
+                    )}
+                  >
+                    <span className="font-black">Información pendiente</span>
+                    <span className="mt-1 block text-xs font-semibold text-muted-foreground">Marca datos por completar.</span>
+                  </button>
+                </div>
+              </section>
+
+              <details className="rounded-2xl border border-border bg-muted/45 p-4">
+                <summary className="cursor-pointer text-sm font-black text-primary">Opciones avanzadas</summary>
+                <div className="mt-4 space-y-4">
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <label className="block">
+                      <span className="mb-1 block text-xs font-black uppercase tracking-[.12em] text-muted-foreground">ID interno</span>
+                      <Input value={form.id} onChange={(event) => updateForm("id", event.target.value)} readOnly={Boolean(editingId)} required />
+                    </label>
+                    <label className="block">
+                      <span className="mb-1 block text-xs font-black uppercase tracking-[.12em] text-muted-foreground">Slug URL</span>
+                      <Input value={form.slug} onChange={(event) => updateForm("slug", event.target.value)} />
+                    </label>
+                  </div>
+
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <label className="block">
+                      <span className="mb-1 block text-xs font-black uppercase tracking-[.12em] text-muted-foreground">Stock</span>
+                      <Input inputMode="numeric" value={form.stock} onChange={(event) => updateForm("stock", event.target.value.replace(/[^\d]/g, ""))} />
+                    </label>
+                    <label className="block">
+                      <span className="mb-1 block text-xs font-black uppercase tracking-[.12em] text-muted-foreground">Orden</span>
+                      <Input inputMode="numeric" value={form.orden} onChange={(event) => updateForm("orden", event.target.value.replace(/[^\d-]/g, ""))} />
+                    </label>
+                  </div>
+
+                  <label className="block">
+                    <span className="mb-1 block text-xs font-black uppercase tracking-[.12em] text-muted-foreground">URL o ruta de imagen</span>
+                    <Input
+                      value={form.imagen}
+                      onChange={(event) => updateForm("imagen", event.target.value)}
+                      placeholder="Se llena automáticamente al subir imagen."
+                    />
+                  </label>
+
+                  <label className="block">
+                    <span className="mb-1 block text-xs font-black uppercase tracking-[.12em] text-muted-foreground">Especificaciones JSON</span>
+                    <textarea
+                      value={form.especificaciones}
+                      onChange={(event) => updateForm("especificaciones", event.target.value)}
+                      className="min-h-24 w-full rounded-xl border border-input bg-background px-4 py-3 font-mono text-xs outline-none transition focus:border-primary/50 focus:ring-4 focus:ring-ring/10"
+                    />
+                  </label>
+                </div>
+              </details>
+
               <Button type="submit" size="lg" className="w-full" disabled={isSaving}>
                 <Save /> {isSaving ? "Guardando…" : "Guardar producto"}
               </Button>
