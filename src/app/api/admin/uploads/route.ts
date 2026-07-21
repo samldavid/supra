@@ -9,9 +9,16 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 const allowedTypes = new Map([
-  ["image/png", "png"],
-  ["image/jpeg", "jpg"],
-  ["image/webp", "webp"],
+  ["image/png", { extension: "png", contentType: "image/png" }],
+  ["image/jpeg", { extension: "jpg", contentType: "image/jpeg" }],
+  ["image/jpg", { extension: "jpg", contentType: "image/jpeg" }],
+  ["image/webp", { extension: "webp", contentType: "image/webp" }],
+]);
+
+const typeByExtension = new Map([
+  ["png", { extension: "png", contentType: "image/png" }],
+  ["jpg", { extension: "jpg", contentType: "image/jpeg" }],
+  ["webp", { extension: "webp", contentType: "image/webp" }],
 ]);
 
 const maxFileSize = 5 * 1024 * 1024;
@@ -52,12 +59,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Debes subir una imagen." }, { status: 400 });
   }
 
-  const extension = allowedTypes.get(file.type);
-
-  if (!extension) {
-    return NextResponse.json({ error: "Solo se permiten imágenes PNG, JPG o WebP." }, { status: 400 });
-  }
-
   if (file.size === 0) {
     return NextResponse.json({ error: "La imagen está vacía. Selecciona otro archivo." }, { status: 400 });
   }
@@ -67,20 +68,30 @@ export async function POST(request: Request) {
   }
 
   const detectedExtension = await detectImageExtension(file);
-
-  if (detectedExtension !== extension) {
+  if (!detectedExtension) {
     return NextResponse.json({ error: "El archivo no parece ser una imagen válida PNG, JPG o WebP." }, { status: 400 });
   }
 
+  const declaredType = file.type ? allowedTypes.get(file.type) : null;
+  const detectedType = typeByExtension.get(detectedExtension);
+
+  if (!detectedType) {
+    return NextResponse.json({ error: "Solo se permiten imágenes PNG, JPG o WebP." }, { status: 400 });
+  }
+
+  if (declaredType && declaredType.extension !== detectedExtension) {
+    return NextResponse.json({ error: "La extensión real de la imagen no coincide con el tipo del archivo." }, { status: 400 });
+  }
+
   const supabase = await createSupabaseServerClient();
-  const safePath = `products/${new Date().toISOString().slice(0, 10)}/${randomUUID()}.${extension}`;
+  const safePath = `products/${new Date().toISOString().slice(0, 10)}/${randomUUID()}.${detectedType.extension}`;
   const { error } = await supabase.storage.from(productImagesBucket).upload(safePath, file, {
-    contentType: file.type,
+    contentType: detectedType.contentType,
     upsert: false,
   });
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 });
+    return NextResponse.json({ error: `Supabase no pudo guardar la imagen: ${error.message}` }, { status: 400 });
   }
 
   const { data } = supabase.storage.from(productImagesBucket).getPublicUrl(safePath);
