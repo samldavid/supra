@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import type { ChangeEvent, DragEvent, FormEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -292,8 +293,13 @@ export function AdminDashboard({ initialProducts, userEmail }: { initialProducts
   const [isDraggingImage, setIsDraggingImage] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [formFeedback, setFormFeedback] = useState<Feedback | null>(null);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!imageFile) {
@@ -754,8 +760,8 @@ export function AdminDashboard({ initialProducts, userEmail }: { initialProducts
         </div>
       </div>
 
-      {isFormOpen ? (
-        <div className="fixed inset-0 z-[80] flex items-center justify-center p-3 sm:p-6" role="presentation">
+      {isMounted && isFormOpen ? createPortal((
+        <div className="fixed inset-0 z-[80] flex items-start justify-center overflow-y-auto p-2 py-4 sm:p-4 lg:p-6" role="presentation">
           <button
             type="button"
             aria-label="Cerrar ventana de producto"
@@ -767,9 +773,9 @@ export function AdminDashboard({ initialProducts, userEmail }: { initialProducts
             role="dialog"
             aria-modal="true"
             aria-labelledby="admin-product-form-title"
-            className="relative max-h-[calc(100svh-1.5rem)] w-full max-w-4xl overflow-y-auto rounded-[1.7rem] border border-border bg-white shadow-[0_24px_80px_rgba(43,24,48,.28)]"
+            className="relative flex max-h-[calc(100svh-2rem)] w-full max-w-4xl flex-col overflow-hidden rounded-[1.25rem] border border-border bg-white shadow-[0_24px_80px_rgba(43,24,48,.28)] sm:max-h-[calc(100svh-3rem)] sm:rounded-[1.7rem]"
           >
-            <div className="sticky top-0 z-10 rounded-t-[1.7rem] border-b border-border bg-white/95 p-5 backdrop-blur">
+            <div className="shrink-0 border-b border-border bg-white/95 p-4 backdrop-blur sm:p-5">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="text-xs font-black uppercase tracking-[.16em] text-primary">{editingId ? "Editar producto" : "Nuevo producto"}</p>
@@ -792,27 +798,28 @@ export function AdminDashboard({ initialProducts, userEmail }: { initialProducts
               {formFeedback ? <FeedbackBox feedback={formFeedback} className="mt-4" /> : null}
             </div>
 
-            <form className="space-y-6 p-5 sm:p-6" onSubmit={saveProduct} noValidate>
-              <div className="rounded-2xl border border-accent/40 bg-accent/15 p-4 text-sm">
-                <div className="flex gap-3">
-                  <Sparkles className="mt-0.5 size-5 shrink-0 text-primary" />
-                  <div>
-                    <p className="font-black text-foreground">Para productos como el jabón Arial</p>
-                    <p className="mt-1 text-muted-foreground">
-                      Escribe nombre, descripción y precio. Sube la foto, elige categoría/presentación con clic y aplica sugerencias.
-                    </p>
-                    <Button type="button" variant="outline" size="sm" className="mt-3 bg-white" onClick={applySuggestedDetails} disabled={isSaving}>
-                      <Sparkles /> {suggestion.label}
-                    </Button>
+            <form className="flex min-h-0 flex-1 flex-col" onSubmit={saveProduct} noValidate>
+              <div className="min-h-0 flex-1 space-y-6 overflow-y-auto p-4 pb-6 sm:p-6">
+                <div className="rounded-2xl border border-accent/40 bg-accent/15 p-4 text-sm">
+                  <div className="flex gap-3">
+                    <Sparkles className="mt-0.5 size-5 shrink-0 text-primary" />
+                    <div>
+                      <p className="font-black text-foreground">Para productos como el jabón Arial</p>
+                      <p className="mt-1 text-muted-foreground">
+                        Escribe nombre, descripción y precio. Sube la foto, elige categoría/presentación con clic y aplica sugerencias.
+                      </p>
+                      <Button type="button" variant="outline" size="sm" className="mt-3 bg-white" onClick={applySuggestedDetails} disabled={isSaving}>
+                        <Sparkles /> {suggestion.label}
+                      </Button>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <section className="space-y-4">
-                <div>
-                  <p className="text-xs font-black uppercase tracking-[.16em] text-primary">1. Datos visibles</p>
-                  <p className="mt-1 text-sm text-muted-foreground">Esto es lo que verá el cliente en catálogo y ficha.</p>
-                </div>
+                <section className="space-y-4">
+                  <div>
+                    <p className="text-xs font-black uppercase tracking-[.16em] text-primary">1. Datos visibles</p>
+                    <p className="mt-1 text-sm text-muted-foreground">Esto es lo que verá el cliente en catálogo y ficha.</p>
+                  </div>
 
                 <div className="grid gap-3 sm:grid-cols-[1.2fr_.8fr]">
                   <label className="block">
@@ -1081,9 +1088,10 @@ export function AdminDashboard({ initialProducts, userEmail }: { initialProducts
                     />
                   </label>
                 </div>
-              </details>
+                </details>
+              </div>
 
-              <div className="sticky bottom-0 -mx-5 -mb-5 border-t border-border bg-white/95 p-5 backdrop-blur sm:-mx-6 sm:-mb-6 sm:p-6">
+              <div className="shrink-0 border-t border-border bg-white/95 p-3 backdrop-blur sm:p-5">
                 <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
                   <Button type="button" variant="outline" onClick={closeForm} disabled={isSaving}>Cancelar</Button>
                   <Button type="submit" size="lg" disabled={isSaving}>
@@ -1094,7 +1102,7 @@ export function AdminDashboard({ initialProducts, userEmail }: { initialProducts
             </form>
           </section>
         </div>
-      ) : null}
+      ), document.body) : null}
     </section>
   );
 }
