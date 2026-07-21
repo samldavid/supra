@@ -112,6 +112,8 @@ const categoryHints = new Map([
 const presentationOptions = [
   "1 galón",
   "1 litro",
+  "5 L",
+  "20 L",
   "500 ml",
   "250 ml",
   "1 kg",
