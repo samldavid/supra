@@ -64,6 +64,12 @@ interface ProductSuggestion {
   especificaciones: Record<string, string>;
 }
 
+interface UploadedImageResult {
+  url: string;
+  path?: string;
+  uploaded: boolean;
+}
+
 const emptyForm: ProductFormState = {
   id: "",
   slug: "",
@@ -446,12 +452,12 @@ export function AdminDashboard({ initialProducts, userEmail }: { initialProducts
     setFormFeedback({ kind: "success", message: "Sugerencias aplicadas. Puedes ajustar cualquier dato antes de guardar." });
   }
 
-  async function uploadImageIfNeeded(currentForm: ProductFormState) {
+  async function uploadImageIfNeeded(currentForm: ProductFormState): Promise<UploadedImageResult> {
     if (!imageFile) {
       if (!currentForm.imagen.trim()) {
         throw new Error("Sube una imagen del producto. Si no tienes foto, deja el producto sin publicar hasta tenerla.");
       }
-      return currentForm.imagen;
+      return { url: currentForm.imagen, uploaded: false };
     }
 
     const formData = new FormData();
@@ -467,7 +473,11 @@ export function AdminDashboard({ initialProducts, userEmail }: { initialProducts
       throw new Error("La imagen se procesó, pero Supabase no devolvió una URL válida.");
     }
 
-    return result.url as string;
+    return {
+      url: result.url as string,
+      path: typeof result.path === "string" ? result.path : undefined,
+      uploaded: true,
+    };
   }
 
   async function refreshProductsFromDatabase(expectedProductId: string) {
@@ -511,8 +521,8 @@ export function AdminDashboard({ initialProducts, userEmail }: { initialProducts
 
       currentStep = imageFile ? "subir la imagen" : "validar la imagen existente";
       setFormFeedback({ kind: "info", message: imageFile ? "Subiendo imagen a Supabase..." : "Conservando la imagen actual del producto..." });
-      const imageUrl = await uploadImageIfNeeded(preparedForm);
-      imageWasUploaded = Boolean(imageFile);
+      const uploadedImage = await uploadImageIfNeeded(preparedForm);
+      imageWasUploaded = uploadedImage.uploaded;
 
       if (imageWasUploaded) {
         setFormFeedback({ kind: "success", message: "Imagen subida a Supabase correctamente. Ahora guardo el producto en la base..." });
@@ -520,7 +530,10 @@ export function AdminDashboard({ initialProducts, userEmail }: { initialProducts
 
       currentStep = "guardar en la base de datos";
       setFormFeedback({ kind: "info", message: "Guardando producto en la base de datos..." });
-      const payload = formToPayload({ ...preparedForm, imagen: imageUrl });
+      const payload = {
+        ...formToPayload({ ...preparedForm, imagen: uploadedImage.url }),
+        uploadedImagePath: uploadedImage.path,
+      };
       const response = await fetch(editingId ? `/api/admin/products/${encodeURIComponent(editingId)}` : "/api/admin/products", {
         method: editingId ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
