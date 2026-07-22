@@ -98,7 +98,7 @@ export function ChemicalHazardPictogram({
     <svg
       viewBox="0 0 72 72"
       role="img"
-      aria-label={label ? `${label} (${code})` : code}
+      aria-label={label ? `${label} (${code})` : `Pictograma de precaución química (${code})`}
       className={cn("shrink-0 text-black", sizeClasses[size], className)}
     >
       <rect

@@ -4,6 +4,8 @@ export const chemicalWarningSpecLabel = "Advertencia química";
 export const chemicalHazardsSpecLabel = "Riesgos químicos";
 export const defaultChemicalWarning =
   "Manipular con precaución. Usar equipo de protección personal adecuado y consultar la ficha de seguridad antes de usar.";
+export const publicChemicalCautionText =
+  "Usar con precaución y equipo de protección adecuado. Sigue las indicaciones del envase y consulta a SupraQuím si necesitas orientación.";
 
 export const chemicalHazardGroups = [
   "Peligros físicos",

@@ -11,6 +11,7 @@ import {
   mergeChemicalSafety,
   mergeChemicalWarning,
   parseChemicalHazardIds,
+  publicChemicalCautionText,
   visibleSpecifications,
 } from "../src/lib/product-safety.ts";
 
@@ -83,4 +84,11 @@ test("oculta los riesgos químicos de la tabla pública de especificaciones", ()
   });
 
   assert.deepEqual(entries, [["Tipo", "Jabón líquido"]]);
+});
+
+test("el texto público de precaución evita mensajes alarmistas", () => {
+  const publicText = publicChemicalCautionText.toLocaleLowerCase("es");
+
+  assert.match(publicText, /precaución/);
+  assert.doesNotMatch(publicText, /muerte|cancer|cáncer|daño grave|toxicidad aguda/);
 });

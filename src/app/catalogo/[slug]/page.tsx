@@ -21,10 +21,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
-  chemicalHazardGroups,
   getChemicalHazards,
   getChemicalWarning,
   getUniqueChemicalPictograms,
+  publicChemicalCautionText,
   visibleSpecifications,
 } from "@/lib/product-safety";
 import { getProductBySlug, getProducts, getRelatedProducts } from "@/lib/products";
@@ -71,12 +71,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const chemicalWarning = getChemicalWarning(product);
   const chemicalHazards = getChemicalHazards(product);
   const chemicalPictograms = getUniqueChemicalPictograms(chemicalHazards);
-  const chemicalHazardGroupsToShow = chemicalHazardGroups
-    .map((group) => ({
-      group,
-      hazards: chemicalHazards.filter((hazard) => hazard.group === group),
-    }))
-    .filter((item) => item.hazards.length);
   const specificationEntries = visibleSpecifications(product);
   const productSchema = {
     "@context": "https://schema.org",
@@ -131,7 +125,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
             {chemicalWarning || chemicalHazards.length ? (
               <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 shadow-[0_12px_35px_rgba(217,119,6,.08)]">
                 <p className="flex items-center gap-2 font-black">
-                  <AlertTriangle className="size-5 shrink-0" /> Riesgo químico / SGA
+                  <AlertTriangle className="size-5 shrink-0" /> Precaución de uso
                 </p>
                 {chemicalPictograms.length ? (
                   <div className="mt-4 flex flex-wrap gap-3">
@@ -140,27 +134,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                     ))}
                   </div>
                 ) : null}
-                {chemicalWarning ? <p className="mt-3 leading-6 font-semibold">{chemicalWarning}</p> : null}
-                {chemicalHazardGroupsToShow.length ? (
-                  <div className="mt-4 grid gap-3">
-                    {chemicalHazardGroupsToShow.map(({ group, hazards }) => (
-                      <div key={group} className="rounded-xl border border-amber-200 bg-white/75 p-3">
-                        <p className="text-xs font-black uppercase tracking-[.12em] text-amber-800">{group}</p>
-                        <ul className="mt-2 grid gap-2">
-                          {hazards.map((hazard) => (
-                            <li key={hazard.id} className="flex items-start gap-3 text-sm leading-6">
-                              <ChemicalHazardPictogram code={hazard.pictogram} label={hazard.label} size="sm" />
-                              <span>
-                                <span className="font-black">{hazard.label}</span>
-                                <span className="block text-amber-900/80">{hazard.description}</span>
-                              </span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    ))}
-                  </div>
-                ) : null}
+                <p className="mt-3 leading-6 font-semibold">{publicChemicalCautionText}</p>
               </div>
             ) : null}
 

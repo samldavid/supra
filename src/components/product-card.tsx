@@ -11,7 +11,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import type { Product } from "@/lib/products";
-import { getChemicalHazards, getChemicalWarning, getUniqueChemicalPictograms } from "@/lib/product-safety";
+import {
+  getChemicalHazards,
+  getChemicalWarning,
+  getUniqueChemicalPictograms,
+  publicChemicalCautionText,
+} from "@/lib/product-safety";
 import { formatPrice } from "@/lib/utils";
 
 interface ProductCardProps {
@@ -49,7 +54,10 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
             {product.descripcion || "Información pendiente"}
           </p>
           {chemicalWarning || chemicalHazards.length ? (
-            <div className="mt-3 flex flex-wrap items-center gap-2 rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-black text-amber-800">
+            <div
+              className="mt-3 flex flex-wrap items-center gap-2 rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-black text-amber-800"
+              title={publicChemicalCautionText}
+            >
               {chemicalPictograms.length ? (
                 chemicalPictograms.slice(0, 4).map((code) => (
                   <ChemicalHazardPictogram key={code} code={code} size="sm" />

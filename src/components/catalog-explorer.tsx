@@ -34,7 +34,7 @@ export function CatalogExplorer({ products, categories, initialCategory = "Todos
         ...product.usos,
         ...product.caracteristicas,
         ...Object.values(product.especificaciones ?? {}),
-        ...getChemicalHazards(product).map((hazard) => `${hazard.label} ${hazard.description} ${hazard.pictogramName}`),
+        ...getChemicalHazards(product).map((hazard) => `${hazard.label} ${hazard.pictogramName}`),
       ]
         .join(" ")
         .toLocaleLowerCase("es");
