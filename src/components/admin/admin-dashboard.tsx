@@ -22,10 +22,22 @@ import {
   X,
 } from "lucide-react";
 
+import { ChemicalHazardPictogram } from "@/components/chemical-hazard-pictogram";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { defaultChemicalWarning, getChemicalWarning, mergeChemicalWarning, visibleSpecifications } from "@/lib/product-safety";
+import {
+  chemicalHazardGroups,
+  chemicalHazards,
+  defaultChemicalWarning,
+  getChemicalHazards,
+  getChemicalHazardsByIds,
+  getChemicalWarning,
+  getUniqueChemicalPictograms,
+  mergeChemicalSafety,
+  visibleSpecifications,
+  type ChemicalHazardId,
+} from "@/lib/product-safety";
 import type { Product } from "@/lib/product-types";
 import { slugify } from "@/lib/slug";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
@@ -55,6 +67,7 @@ interface ProductFormState {
   usos: string;
   caracteristicas: string;
   advertenciaQuimica: string;
+  riesgosQuimicos: ChemicalHazardId[];
   especificaciones: string;
   informacionPendiente: boolean;
 }
@@ -90,6 +103,7 @@ const emptyForm: ProductFormState = {
   usos: "",
   caracteristicas: "",
   advertenciaQuimica: "",
+  riesgosQuimicos: [],
   especificaciones: "{}",
   informacionPendiente: false,
 };
@@ -214,7 +228,7 @@ function buildSpecifications(form: ProductFormState) {
     ? parsedSpecifications
     : { Estado: "Información pendiente" };
 
-  return JSON.stringify(mergeChemicalWarning(baseSpecifications, form.advertenciaQuimica), null, 2);
+  return JSON.stringify(mergeChemicalSafety(baseSpecifications, form.advertenciaQuimica, form.riesgosQuimicos), null, 2);
 }
 
 function productToForm(product: Product): ProductFormState {
@@ -234,6 +248,7 @@ function productToForm(product: Product): ProductFormState {
     usos: product.usos.join("\n"),
     caracteristicas: product.caracteristicas.join("\n"),
     advertenciaQuimica: getChemicalWarning(product),
+    riesgosQuimicos: getChemicalHazards(product).map((hazard) => hazard.id),
     especificaciones: JSON.stringify(Object.fromEntries(visibleSpecifications(product)), null, 2),
     informacionPendiente: Boolean(product.informacionPendiente),
   };
@@ -256,6 +271,7 @@ function prepareFormForSubmit(form: ProductFormState, products: Product[], editi
     presentacion === "Información pendiente" ||
     !form.descripcion.trim() ||
     !form.precio.trim();
+  const chemicalWarning = form.advertenciaQuimica.trim() || (form.riesgosQuimicos.length ? defaultChemicalWarning : "");
 
   return {
     ...form,
@@ -267,7 +283,8 @@ function prepareFormForSubmit(form: ProductFormState, products: Product[], editi
     descripcion: form.descripcion.trim() || "Información pendiente",
     usos: form.usos.trim() || "Información pendiente",
     caracteristicas: form.caracteristicas.trim() || "Información pendiente",
-    advertenciaQuimica: form.advertenciaQuimica.trim(),
+    advertenciaQuimica: chemicalWarning,
+    riesgosQuimicos: form.riesgosQuimicos,
     especificaciones: buildSpecifications(form),
     informacionPendiente: hasPendingInfo,
   };
@@ -322,6 +339,7 @@ export function AdminDashboard({ initialProducts, userEmail }: { initialProducts
   const [imagePreviewUrl, setImagePreviewUrl] = useState("");
   const [isDraggingImage, setIsDraggingImage] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isHazardPickerOpen, setIsHazardPickerOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [feedback, setFeedback] = useState<Feedback | null>(null);
@@ -351,6 +369,10 @@ export function AdminDashboard({ initialProducts, userEmail }: { initialProducts
 
     function closeOnEscape(event: KeyboardEvent) {
       if (event.key === "Escape" && !isSaving) {
+        if (isHazardPickerOpen) {
+          setIsHazardPickerOpen(false);
+          return;
+        }
         closeForm();
       }
     }
@@ -362,7 +384,7 @@ export function AdminDashboard({ initialProducts, userEmail }: { initialProducts
       window.removeEventListener("keydown", closeOnEscape);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isFormOpen, isSaving]);
+  }, [isFormOpen, isHazardPickerOpen, isSaving]);
 
   const categories = useMemo(
     () => Array.from(new Set(products.map((product) => product.categoria))).sort((a, b) => a.localeCompare(b, "es")),
@@ -381,6 +403,9 @@ export function AdminDashboard({ initialProducts, userEmail }: { initialProducts
     categories: categories.length,
   }), [categories.length, products]);
 
+  const selectedChemicalHazards = getChemicalHazardsByIds(form.riesgosQuimicos);
+  const selectedChemicalPictograms = getUniqueChemicalPictograms(selectedChemicalHazards);
+
   const filteredProducts = useMemo(() => {
     const normalizedQuery = query.trim().toLocaleLowerCase("es");
     return products.filter((product) => {
@@ -390,6 +415,7 @@ export function AdminDashboard({ initialProducts, userEmail }: { initialProducts
         product.presentacion,
         product.descripcion,
         getChemicalWarning(product),
+        ...getChemicalHazards(product).map((hazard) => `${hazard.label} ${hazard.description} ${hazard.pictogramName}`),
       ]
         .join(" ")
         .toLocaleLowerCase("es")
@@ -455,6 +481,7 @@ export function AdminDashboard({ initialProducts, userEmail }: { initialProducts
     setImageFile(null);
     setForm(emptyForm);
     setIsFormOpen(true);
+    setIsHazardPickerOpen(false);
     setFeedback(null);
     setFormFeedback({ kind: "info", message: "Completa nombre, descripción, precio y foto. Si aplica, añade la advertencia química en la primera sección." });
   }
@@ -464,6 +491,7 @@ export function AdminDashboard({ initialProducts, userEmail }: { initialProducts
     setImageFile(null);
     setForm(productToForm(product));
     setIsFormOpen(true);
+    setIsHazardPickerOpen(false);
     setFeedback(null);
     setFormFeedback({ kind: "info", message: "Edita lo necesario. La advertencia química aparece en la primera sección y lo avanzado se completa automáticamente." });
   }
@@ -471,9 +499,35 @@ export function AdminDashboard({ initialProducts, userEmail }: { initialProducts
   function closeForm() {
     if (isSaving) return;
     setIsFormOpen(false);
+    setIsHazardPickerOpen(false);
     setImageFile(null);
     setIsDraggingImage(false);
     setFormFeedback(null);
+  }
+
+  function toggleChemicalHazard(id: ChemicalHazardId) {
+    setForm((current) => {
+      const selected = current.riesgosQuimicos.includes(id);
+      const nextHazardIds = selected
+        ? current.riesgosQuimicos.filter((item) => item !== id)
+        : [...current.riesgosQuimicos, id];
+
+      return {
+        ...current,
+        riesgosQuimicos: nextHazardIds,
+        advertenciaQuimica: nextHazardIds.length && !current.advertenciaQuimica.trim()
+          ? defaultChemicalWarning
+          : current.advertenciaQuimica,
+      };
+    });
+  }
+
+  function clearChemicalHazards() {
+    setForm((current) => ({
+      ...current,
+      advertenciaQuimica: "",
+      riesgosQuimicos: [],
+    }));
   }
 
   function applySuggestedDetails() {
@@ -766,10 +820,15 @@ export function AdminDashboard({ initialProducts, userEmail }: { initialProducts
                         <div>
                           <p className="font-black">{product.nombre}</p>
                           <p className="text-xs font-semibold text-muted-foreground">{product.presentacion}</p>
-                          {getChemicalWarning(product) ? (
-                            <p className="mt-1 inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-black text-amber-800">
-                              <AlertTriangle className="size-3" /> Advertencia química
-                            </p>
+                          {getChemicalHazards(product).length || getChemicalWarning(product) ? (
+                            <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                              {getUniqueChemicalPictograms(getChemicalHazards(product)).slice(0, 3).map((code) => (
+                                <ChemicalHazardPictogram key={code} code={code} size="sm" className="size-6" />
+                              ))}
+                              <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-black text-amber-800">
+                                Riesgo químico
+                              </span>
+                            </div>
                           ) : null}
                         </div>
                       </div>
@@ -897,37 +956,62 @@ export function AdminDashboard({ initialProducts, userEmail }: { initialProducts
                   <div className="flex gap-3">
                     <AlertTriangle className="mt-0.5 size-5 shrink-0 text-amber-700" />
                     <div>
-                      <p className="font-black text-amber-950">Advertencia química, opcional</p>
+                      <p className="font-black text-amber-950">Riesgo químico, opcional</p>
                       <p className="mt-1 text-sm leading-6 text-amber-900/80">
-                        Si el producto requiere cuidado, añade aquí la advertencia. Aparecerá en el catálogo y en la ficha del producto.
+                        Selecciona uno o varios riesgos SGA/GHS. El cliente verá sus pictogramas en el catálogo y en la ficha.
                       </p>
                     </div>
                   </div>
+
+                  {selectedChemicalHazards.length ? (
+                    <div className="mt-4 rounded-2xl border border-amber-200 bg-white p-4">
+                      <div className="flex flex-wrap items-center gap-2">
+                        {selectedChemicalPictograms.map((code) => (
+                          <ChemicalHazardPictogram key={code} code={code} size="sm" />
+                        ))}
+                        <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-black text-amber-900">
+                          {selectedChemicalHazards.length} {selectedChemicalHazards.length === 1 ? "riesgo seleccionado" : "riesgos seleccionados"}
+                        </span>
+                      </div>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {selectedChemicalHazards.map((hazard) => (
+                          <span key={hazard.id} className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-black text-amber-900">
+                            {hazard.label}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="mt-4 rounded-2xl border border-dashed border-amber-200 bg-white/70 px-4 py-3 text-sm font-semibold text-amber-900/75">
+                      Sin riesgos químicos seleccionados.
+                    </p>
+                  )}
+
                   <div className="mt-4 flex flex-wrap gap-2">
                     <Button
                       type="button"
                       variant="outline"
                       size="sm"
                       className="bg-white"
-                      onClick={() => updateForm("advertenciaQuimica", defaultChemicalWarning)}
+                      onClick={() => setIsHazardPickerOpen(true)}
                       disabled={isSaving}
                     >
-                      <AlertTriangle /> Añadir advertencia estándar
+                      <AlertTriangle /> {selectedChemicalHazards.length ? "Editar riesgos químicos" : "Añadir riesgo químico"}
                     </Button>
-                    {form.advertenciaQuimica ? (
+                    {selectedChemicalHazards.length || form.advertenciaQuimica ? (
                       <Button
                         type="button"
                         variant="ghost"
                         size="sm"
-                        onClick={() => updateForm("advertenciaQuimica", "")}
+                        onClick={clearChemicalHazards}
                         disabled={isSaving}
                       >
-                        Quitar advertencia
+                        Quitar riesgos
                       </Button>
                     ) : null}
                   </div>
                   <label className="mt-4 block">
-                    <span className="mb-1 block text-xs font-black uppercase tracking-[.12em] text-amber-900/70">Texto visible de advertencia</span>
+                    <span className="mb-1 block text-xs font-black uppercase tracking-[.12em] text-amber-900/70">Nota de precaución visible</span>
                     <textarea
                       value={form.advertenciaQuimica}
                       onChange={(event) => updateForm("advertenciaQuimica", event.target.value)}
@@ -1187,6 +1271,118 @@ export function AdminDashboard({ initialProducts, userEmail }: { initialProducts
                 </div>
               </div>
             </form>
+          </section>
+        </div>
+      ), document.body) : null}
+
+      {isMounted && isHazardPickerOpen ? createPortal((
+        <div className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto p-2 py-4 sm:p-4 lg:p-6" role="presentation">
+          <button
+            type="button"
+            aria-label="Cerrar selector de riesgos químicos"
+            className="absolute inset-0 bg-[#1d0823]/60 backdrop-blur-sm"
+            onClick={() => setIsHazardPickerOpen(false)}
+            disabled={isSaving}
+          />
+          <section
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="chemical-hazard-picker-title"
+            className="relative flex max-h-[calc(100svh-2rem)] w-full max-w-5xl flex-col overflow-hidden rounded-[1.25rem] border border-border bg-white shadow-[0_24px_80px_rgba(43,24,48,.32)] sm:max-h-[calc(100svh-3rem)] sm:rounded-[1.7rem]"
+          >
+            <div className="shrink-0 border-b border-border bg-white/95 p-4 backdrop-blur sm:p-5">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[.16em] text-primary">SGA / GHS</p>
+                  <h2 id="chemical-hazard-picker-title" className="mt-1 text-2xl font-black">Seleccionar riesgos químicos</h2>
+                  <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
+                    Marca únicamente los riesgos confirmados para este producto. Puedes seleccionar varios; los pictogramas se mostrarán al cliente.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsHazardPickerOpen(false)}
+                  aria-label="Cerrar"
+                  disabled={isSaving}
+                  className="rounded-xl p-2 text-muted-foreground hover:bg-muted hover:text-primary disabled:opacity-50"
+                >
+                  <X className="size-5" />
+                </button>
+              </div>
+            </div>
+
+            <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-5">
+              <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-900">
+                Este selector es una ayuda visual para comunicar riesgos. No reemplaza la ficha de datos de seguridad ni la clasificación técnica del proveedor.
+              </div>
+
+              <div className="mt-5 space-y-6">
+                {chemicalHazardGroups.map((group) => {
+                  const hazards = chemicalHazards.filter((hazard) => hazard.group === group);
+
+                  return (
+                    <section key={group} className="space-y-3">
+                      <div>
+                        <p className="text-xs font-black uppercase tracking-[.16em] text-primary">{group}</p>
+                      </div>
+
+                      <div className="grid gap-3 md:grid-cols-2">
+                        {hazards.map((hazard) => {
+                          const selected = form.riesgosQuimicos.includes(hazard.id);
+
+                          return (
+                            <button
+                              key={hazard.id}
+                              type="button"
+                              aria-pressed={selected}
+                              onClick={() => toggleChemicalHazard(hazard.id)}
+                              disabled={isSaving}
+                              className={cn(
+                                "flex gap-4 rounded-2xl border p-4 text-left transition focus:outline-none focus:ring-4 focus:ring-ring/10 disabled:opacity-60",
+                                selected ? "border-amber-400 bg-amber-50 shadow-[0_12px_35px_rgba(217,119,6,.10)]" : "border-border bg-white hover:border-amber-300 hover:bg-amber-50/45",
+                              )}
+                            >
+                              <ChemicalHazardPictogram code={hazard.pictogram} label={hazard.label} size="md" />
+                              <span>
+                                <span className="flex flex-wrap items-center gap-2">
+                                  <span className="font-black text-foreground">{hazard.label}</span>
+                                  <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-black text-muted-foreground">
+                                    {hazard.pictogram}
+                                  </span>
+                                  {selected ? <CheckCircle2 className="size-4 text-amber-700" /> : null}
+                                </span>
+                                <span className="mt-1 block text-xs font-black uppercase tracking-[.12em] text-amber-800">
+                                  {hazard.pictogramName}
+                                </span>
+                                <span className="mt-2 block text-sm leading-6 text-muted-foreground">{hazard.description}</span>
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </section>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="shrink-0 border-t border-border bg-white/95 p-3 backdrop-blur sm:p-5">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-sm font-semibold text-muted-foreground">
+                  {selectedChemicalHazards.length
+                    ? `${selectedChemicalHazards.length} ${selectedChemicalHazards.length === 1 ? "riesgo seleccionado" : "riesgos seleccionados"}`
+                    : "Ningún riesgo seleccionado"}
+                </p>
+                <div className="flex flex-col gap-3 sm:flex-row">
+                  <Button type="button" variant="outline" onClick={() => setIsHazardPickerOpen(false)} disabled={isSaving}>
+                    Cancelar
+                  </Button>
+                  <Button type="button" onClick={() => setIsHazardPickerOpen(false)} disabled={isSaving}>
+                    Guardar selección
+                  </Button>
+                </div>
+              </div>
+            </div>
           </section>
         </div>
       ), document.body) : null}

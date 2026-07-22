@@ -14,12 +14,19 @@ import {
 } from "lucide-react";
 
 import { AddToCartButton } from "@/components/cart/add-to-cart-button";
+import { ChemicalHazardPictogram } from "@/components/chemical-hazard-pictogram";
 import { ProductCard } from "@/components/product-card";
 import { ProductImageZoom } from "@/components/product-image-zoom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { getChemicalWarning, visibleSpecifications } from "@/lib/product-safety";
+import {
+  chemicalHazardGroups,
+  getChemicalHazards,
+  getChemicalWarning,
+  getUniqueChemicalPictograms,
+  visibleSpecifications,
+} from "@/lib/product-safety";
 import { getProductBySlug, getProducts, getRelatedProducts } from "@/lib/products";
 import { formatPrice } from "@/lib/utils";
 import { getProductWhatsAppUrl } from "@/lib/whatsapp";
@@ -62,6 +69,14 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const related = getRelatedProducts(products, product);
   const whatsappUrl = getProductWhatsAppUrl(`${product.nombre} (${product.presentacion})`);
   const chemicalWarning = getChemicalWarning(product);
+  const chemicalHazards = getChemicalHazards(product);
+  const chemicalPictograms = getUniqueChemicalPictograms(chemicalHazards);
+  const chemicalHazardGroupsToShow = chemicalHazardGroups
+    .map((group) => ({
+      group,
+      hazards: chemicalHazards.filter((hazard) => hazard.group === group),
+    }))
+    .filter((item) => item.hazards.length);
   const specificationEntries = visibleSpecifications(product);
   const productSchema = {
     "@context": "https://schema.org",
@@ -113,12 +128,39 @@ export default async function ProductPage({ params }: ProductPageProps) {
               </div>
             ) : null}
 
-            {chemicalWarning ? (
+            {chemicalWarning || chemicalHazards.length ? (
               <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 shadow-[0_12px_35px_rgba(217,119,6,.08)]">
                 <p className="flex items-center gap-2 font-black">
-                  <AlertTriangle className="size-5 shrink-0" /> Advertencia química
+                  <AlertTriangle className="size-5 shrink-0" /> Riesgo químico / SGA
                 </p>
-                <p className="mt-2 leading-6 font-semibold">{chemicalWarning}</p>
+                {chemicalPictograms.length ? (
+                  <div className="mt-4 flex flex-wrap gap-3">
+                    {chemicalPictograms.map((code) => (
+                      <ChemicalHazardPictogram key={code} code={code} size="lg" />
+                    ))}
+                  </div>
+                ) : null}
+                {chemicalWarning ? <p className="mt-3 leading-6 font-semibold">{chemicalWarning}</p> : null}
+                {chemicalHazardGroupsToShow.length ? (
+                  <div className="mt-4 grid gap-3">
+                    {chemicalHazardGroupsToShow.map(({ group, hazards }) => (
+                      <div key={group} className="rounded-xl border border-amber-200 bg-white/75 p-3">
+                        <p className="text-xs font-black uppercase tracking-[.12em] text-amber-800">{group}</p>
+                        <ul className="mt-2 grid gap-2">
+                          {hazards.map((hazard) => (
+                            <li key={hazard.id} className="flex items-start gap-3 text-sm leading-6">
+                              <ChemicalHazardPictogram code={hazard.pictogram} label={hazard.label} size="sm" />
+                              <span>
+                                <span className="font-black">{hazard.label}</span>
+                                <span className="block text-amber-900/80">{hazard.description}</span>
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
               </div>
             ) : null}
 

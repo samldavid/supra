@@ -7,6 +7,7 @@ import { Search, SlidersHorizontal, X } from "lucide-react";
 import { ProductCard } from "@/components/product-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { getChemicalHazards } from "@/lib/product-safety";
 import type { Product } from "@/lib/products";
 
 interface CatalogExplorerProps {
@@ -33,6 +34,7 @@ export function CatalogExplorer({ products, categories, initialCategory = "Todos
         ...product.usos,
         ...product.caracteristicas,
         ...Object.values(product.especificaciones ?? {}),
+        ...getChemicalHazards(product).map((hazard) => `${hazard.label} ${hazard.description} ${hazard.pictogramName}`),
       ]
         .join(" ")
         .toLocaleLowerCase("es");

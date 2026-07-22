@@ -2,10 +2,15 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  chemicalHazardsSpecLabel,
   chemicalWarningSpecLabel,
   defaultChemicalWarning,
+  getChemicalHazards,
   getChemicalWarning,
+  getUniqueChemicalPictograms,
+  mergeChemicalSafety,
   mergeChemicalWarning,
+  parseChemicalHazardIds,
   visibleSpecifications,
 } from "../src/lib/product-safety.ts";
 
@@ -37,6 +42,43 @@ test("oculta la advertencia de la tabla pública de especificaciones", () => {
     especificaciones: {
       Tipo: "Jabón líquido",
       [chemicalWarningSpecLabel]: defaultChemicalWarning,
+    },
+  });
+
+  assert.deepEqual(entries, [["Tipo", "Jabón líquido"]]);
+});
+
+test("guarda y lee varios riesgos químicos con pictogramas GHS", () => {
+  const specifications = mergeChemicalSafety(
+    { Tipo: "Materia prima" },
+    "",
+    ["inflamables", "comburentes", "irritacion-cutanea-ocular"],
+  );
+
+  const hazards = getChemicalHazards({ especificaciones: specifications });
+  const pictograms = getUniqueChemicalPictograms(hazards);
+
+  assert.deepEqual(hazards.map((hazard) => hazard.id), [
+    "inflamables",
+    "comburentes",
+    "irritacion-cutanea-ocular",
+  ]);
+  assert.deepEqual(pictograms, ["GHS02", "GHS03", "GHS07"]);
+});
+
+test("normaliza nombres visibles de riesgos y no duplica pictogramas repetidos", () => {
+  const ids = parseChemicalHazardIds("Corrosivos para metales, Corrosión cutánea / lesiones oculares graves");
+  const pictograms = getUniqueChemicalPictograms(getChemicalHazards({ riesgosQuimicos: ids, especificaciones: {} }));
+
+  assert.deepEqual(ids, ["corrosivos-para-metales", "corrosion-cutanea-lesiones-oculares"]);
+  assert.deepEqual(pictograms, ["GHS05"]);
+});
+
+test("oculta los riesgos químicos de la tabla pública de especificaciones", () => {
+  const entries = visibleSpecifications({
+    especificaciones: {
+      Tipo: "Jabón líquido",
+      [chemicalHazardsSpecLabel]: JSON.stringify(["inflamables"]),
     },
   });
 

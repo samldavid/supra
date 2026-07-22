@@ -6,11 +6,12 @@ import { motion } from "framer-motion";
 import { AlertTriangle, ArrowUpRight } from "lucide-react";
 
 import { AddToCartButton } from "@/components/cart/add-to-cart-button";
+import { ChemicalHazardPictogram } from "@/components/chemical-hazard-pictogram";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import type { Product } from "@/lib/products";
-import { getChemicalWarning } from "@/lib/product-safety";
+import { getChemicalHazards, getChemicalWarning, getUniqueChemicalPictograms } from "@/lib/product-safety";
 import { formatPrice } from "@/lib/utils";
 
 interface ProductCardProps {
@@ -20,6 +21,8 @@ interface ProductCardProps {
 
 export function ProductCard({ product, priority = false }: ProductCardProps) {
   const chemicalWarning = getChemicalWarning(product);
+  const chemicalHazards = getChemicalHazards(product);
+  const chemicalPictograms = getUniqueChemicalPictograms(chemicalHazards);
 
   return (
     <motion.article layout whileHover={{ y: -5 }} transition={{ duration: 0.22 }} className="h-full">
@@ -45,9 +48,17 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
           <p className="mt-2 line-clamp-2 text-sm leading-6 text-muted-foreground">
             {product.descripcion || "Información pendiente"}
           </p>
-          {chemicalWarning ? (
-            <div className="mt-3 inline-flex w-fit items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-black text-amber-800">
-              <AlertTriangle className="size-3.5" /> Uso con precaución
+          {chemicalWarning || chemicalHazards.length ? (
+            <div className="mt-3 flex flex-wrap items-center gap-2 rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-black text-amber-800">
+              {chemicalPictograms.length ? (
+                chemicalPictograms.slice(0, 4).map((code) => (
+                  <ChemicalHazardPictogram key={code} code={code} size="sm" />
+                ))
+              ) : (
+                <AlertTriangle className="size-4" />
+              )}
+              <span>Uso con precaución</span>
+              {chemicalPictograms.length > 4 ? <span>+{chemicalPictograms.length - 4}</span> : null}
             </div>
           ) : null}
           <div className="mt-auto flex flex-col gap-3 pt-5">

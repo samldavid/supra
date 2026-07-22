@@ -10,6 +10,7 @@ export interface Product {
   caracteristicas: string[];
   especificaciones: Record<string, string>;
   advertenciaQuimica?: string;
+  riesgosQuimicos?: string[];
   imagen: string;
   destacado?: boolean;
   activo?: boolean;
