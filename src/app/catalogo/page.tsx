@@ -18,16 +18,17 @@ export const metadata: Metadata = {
 };
 
 interface CatalogPageProps {
-  searchParams: Promise<{ categoria?: string }>;
+  searchParams: Promise<{ categoria?: string; q?: string }>;
 }
 
 export default async function CatalogPage({ searchParams }: CatalogPageProps) {
   const products = await getProducts();
   const categories = getCategories(products);
-  const { categoria } = await searchParams;
+  const { categoria, q } = await searchParams;
   const initialCategory = categoria && categories.includes(categoria)
     ? categoria
     : "Todos";
+  const initialQuery = q?.trim() ?? "";
 
   return (
     <>
@@ -44,7 +45,13 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
       </section>
       <section className="py-10 sm:py-14">
         <div className="shell">
-          <CatalogExplorer products={products} categories={categories} initialCategory={initialCategory} />
+          <CatalogExplorer
+            key={`${initialCategory}:${initialQuery}`}
+            products={products}
+            categories={categories}
+            initialCategory={initialCategory}
+            initialQuery={initialQuery}
+          />
         </div>
       </section>
     </>

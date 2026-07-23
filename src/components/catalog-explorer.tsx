@@ -14,12 +14,18 @@ interface CatalogExplorerProps {
   products: Product[];
   categories: string[];
   initialCategory?: string;
+  initialQuery?: string;
 }
 
 type SortOption = "featured" | "price-asc" | "price-desc" | "name";
 
-export function CatalogExplorer({ products, categories, initialCategory = "Todos" }: CatalogExplorerProps) {
-  const [query, setQuery] = useState("");
+export function CatalogExplorer({
+  products,
+  categories,
+  initialCategory = "Todos",
+  initialQuery = "",
+}: CatalogExplorerProps) {
+  const [query, setQuery] = useState(initialQuery);
   const [category, setCategory] = useState(initialCategory);
   const [sort, setSort] = useState<SortOption>("featured");
   const deferredQuery = useDeferredValue(query.trim().toLocaleLowerCase("es"));
